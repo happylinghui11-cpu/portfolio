@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lyu Mingyang — Illustration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#14141a;
+    --ink-soft:#6b6b74;
+    --coral:#ff5a36;
+    --blue:#2f6bff;
+    --gap: 28px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #track{ animation:none !important; }
+    *{ transition-duration:0.01ms !important; }
+  }
+
+  a{color:inherit;text-decoration:none;}
+  img{-webkit-user-drag:none; user-select:none;}
+
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:60;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 40px;
+    pointer-events:none;
+  }
+  .topbar *{pointer-events:auto;}
+  .mark{ font-size:14px; font-weight:600; letter-spacing:0.4px; }
+  .nav-links{display:flex; align-items:center; gap:24px; font-size:13px; color:var(--ink-soft);}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a:focus-visible, .mark:focus-visible{outline:2px solid var(--blue); outline-offset:4px;}
+
+  .lang-switch{ display:flex; gap:2px; font-size:12px; color:var(--ink-soft); }
+  .lang-switch button{
+    font-family:'Space Grotesk', sans-serif;
+    background:none; border:none; cursor:pointer;
+    font-size:12px; color:var(--ink-soft);
+    padding:4px 6px;
+  }
+  .lang-switch button.active{ color:var(--ink); font-weight:600; }
+  .lang-switch button:hover{ color:var(--ink); }
+  .lang-switch span{ color:#d8d8dc; }
+
+  #view-home{ display:block; }
+
+  .stage{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:var(--bg);
+  }
+
+  #track{
+    position:absolute;
+    top:0; left:0;
+    will-change:transform;
+  }
+  .tile{ position:absolute; top:0; left:0; }
+
+  .thumb{
+    position:absolute;
+    overflow:hidden;
+    cursor:pointer;
+    opacity:0;
+    filter:blur(14px);
+    transition:opacity .8s ease, filter .8s ease;
+    background:#f3f3f3;
+  }
+  .thumb.in-view{ opacity:1; filter:blur(0); }
+  .thumb img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+    transition:transform 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  .thumb:hover img{ transform:scale(1.05); }
+
+  .thumb .cap{
+    position:absolute; left:12px; bottom:10px;
+    font-size:11px; color:#fff;
+    opacity:0; transition:opacity .3s ease;
+    text-shadow:0 1px 6px rgba(0,0,0,.5);
+  }
+  .thumb:hover .cap{opacity:1;}
+  .thumb.square-fit img{ object-fit:contain; background:#ffffff; }
+
+  .edge-vignette{
+    position:absolute; inset:0;
+    z-index:30;
+    pointer-events:none;
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    -webkit-mask-image:radial-gradient(ellipse 78% 78% at center, transparent 42%, black 96%);
+    mask-image:radial-gradient(ellipse 78% 78% at center, transparent 42%, black 96%);
+  }
+
+  .name-overlay{
+    position:fixed;
+    top:44%;
+    left:58%;
+    z-index:40;
+    text-align:left;
+    cursor:pointer;
+  }
+  .name-overlay::before{
+    content:'';
+    position:absolute;
+    inset:-24px -34px;
+    background:radial-gradient(closest-side, rgba(255,255,255,0.85), rgba(255,255,255,0));
+    z-index:-1;
+    pointer-events:none;
+  }
+  .name-overlay h1{
+    margin:0;
+    font-size:26px;
+    font-weight:600;
+    letter-spacing:0.2px;
+  }
+  .name-overlay p{
+    margin:6px 0 0;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    max-width:230px;
+    line-height:1.6;
+  }
+  .name-overlay:hover h1{ color:var(--coral); }
+
+  .scroll-hint{
+    position:fixed; left:40px; bottom:28px; z-index:40;
+    font-size:11px; color:var(--ink-soft);
+  }
+
+  #view-gallery{
+    display:none;
+    min-height:100vh;
+    padding:140px 40px 100px;
+  }
+  #view-gallery.active{display:block;}
+
+  .back-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; color:var(--ink-soft);
+    margin-bottom:34px;
+    cursor:pointer; background:none; border:none; padding:0;
+    font-family:'Space Grotesk', sans-serif;
+  }
+  .back-btn:hover{color:var(--ink);}
+  .back-btn svg{width:15px; height:15px;}
+
+  .series-head{ margin-bottom:52px; max-width:640px; }
+  .series-head h2{ font-size:28px; font-weight:600; margin:0 0 8px 0; }
+  .series-head .meta-line{ font-size:12.5px; color:var(--ink-soft); margin:0 0 16px; }
+  .series-head p{ color:var(--ink-soft); font-size:14px; line-height:1.75; margin:0 0 10px; white-space:pre-line; }
+  .series-head p:empty, .series-head .meta-line:empty{ display:none; margin:0; }
+
+  #view-allwork{
+    display:none;
+    min-height:100vh;
+    padding:150px 40px 100px;
+  }
+  #view-allwork.active{ display:block; }
+  .allwork-intro{ max-width:560px; margin-bottom:48px; }
+  .allwork-intro h2{ font-size:26px; font-weight:600; margin:0 0 10px; }
+  .allwork-intro p{ font-size:14px; color:var(--ink-soft); margin:0; line-height:1.7; }
+  .allwork-timeline{ max-width:1100px; }
+  .timeline-year-block{
+    display:flex;
+    gap:26px;
+    padding:0 0 44px 26px;
+    border-left:2px solid #ececec;
+    position:relative;
+  }
+  .timeline-year-block::before{
+    content:'';
+    position:absolute; left:-5px; top:5px;
+    width:8px; height:8px;
+    background:var(--ink);
+  }
+  .timeline-year-label{
+    width:60px; flex-shrink:0;
+    font-size:19px; font-weight:600;
+    padding-top:2px;
+  }
+  .timeline-cards{
+    display:flex; flex-wrap:wrap;
+    gap:20px 22px;
+    flex:1;
+  }
+  .allwork-card{ width:126px; cursor:pointer; }
+  .allwork-card .cover{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    overflow:hidden;
+    background:#ffffff;
+    border:1px solid #f0f0f0;
+  }
+  .allwork-card .cover img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:contain;
+    background:#ffffff;
+    display:block;
+    opacity:0;
+    transition:opacity .6s ease;
+  }
+  .allwork-card .cover img.layer-active{ opacity:1; }
+  .allwork-card .card-title{ margin-top:9px; font-size:12px; font-weight:600; line-height:1.3; }
+  .allwork-card .card-count{ margin-top:2px; font-size:10.5px; color:var(--ink-soft); }
+  @media (max-width:640px){
+    .timeline-year-block{ padding-left:18px; gap:16px; }
+    .timeline-year-label{ width:44px; font-size:16px; }
+    .allwork-card{ width:100px; }
+  }
+
+  .masonry{ display:grid; grid-template-columns:repeat(2, 1fr); gap:var(--gap); max-width:920px; }
+  @media (max-width:640px){
+    .masonry{ grid-template-columns:1fr; }
+    .name-overlay{ left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; }
+    .name-overlay p{ margin-left:auto; margin-right:auto; }
+  }
+
+  .piece{
+    opacity:0; filter:blur(14px);
+    transition:opacity .7s ease, filter .7s ease;
+  }
+  .piece.in-view{ opacity:1; filter:blur(0); }
+  .piece-frame{
+    position:relative;
+    width:100%;
+    overflow:hidden;
+    background:#f5f5f5;
+  }
+  .piece-frame img, .piece-frame video{
+    width:100%;
+    height:auto;
+    display:block;
+  }
+  .piece-frame.square-fit{
+    position:relative;
+    aspect-ratio:1/1;
+    background:#ffffff;
+    border:1px solid #f0f0f0;
+  }
+  .piece-frame.square-fit img, .piece-frame.square-fit video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:contain;
+    background:#ffffff;
+  }
+  .piece .meta{ padding:12px 2px 0; font-size:12.5px; color:var(--ink-soft); }
+  .expand-btn{
+    position:absolute; top:10px; right:10px; z-index:5;
+    width:32px; height:32px; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(20,20,26,0.55); border:none; border-radius:50%;
+    color:#fff; cursor:pointer;
+    opacity:0; transition:opacity .2s ease, background .2s ease;
+  }
+  .expand-btn svg{ width:16px; height:16px; }
+  .expand-btn:hover{ background:rgba(20,20,26,0.85); }
+  .piece-frame:hover .expand-btn{ opacity:1; }
+  @media (hover:none){ .expand-btn{ opacity:1; } }
+
+  /* contact-sheet display mode for series with many small pieces */
+  .contact-sheet{
+    display:flex; flex-wrap:wrap;
+    gap:8px;
+    max-width:940px;
+  }
+  .contact-tile{
+    width:96px; height:96px;
+    overflow:hidden;
+    cursor:pointer;
+    background:#ffffff;
+    border:1px solid #f0f0f0;
+    opacity:0; filter:blur(6px);
+    transition:opacity .5s ease, filter .5s ease, transform .2s ease;
+  }
+  .contact-tile.in-view{ opacity:1; filter:blur(0); }
+  .contact-tile:hover{ transform:scale(1.06); }
+  .contact-tile img{ width:100%; height:100%; object-fit:contain; background:#ffffff; display:block; }
+  @media (max-width:640px){
+    .contact-tile{ width:72px; height:72px; }
+  }
+
+  #lightbox{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(255,255,255,0.97);
+    display:none;
+    align-items:center; justify-content:center;
+  }
+  #lightbox.active{ display:flex; }
+  #lightbox img{
+    max-width:86vw; max-height:80vh;
+    object-fit:contain;
+    display:block;
+  }
+  #lightbox video{
+    max-width:86vw; max-height:80vh;
+    object-fit:contain;
+    display:none;
+    background:#000;
+  }
+  #lightbox .lb-close{
+    position:absolute; top:24px; right:32px;
+    font-size:15px; letter-spacing:0.3px;
+    background:none; border:none; cursor:pointer;
+    color:var(--ink-soft); font-family:'Space Grotesk', sans-serif;
+  }
+  #lightbox .lb-close:hover{ color:var(--ink); }
+  #lightbox .lb-nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:none; border:none; cursor:pointer;
+    color:var(--ink-soft); padding:14px;
+  }
+  #lightbox .lb-nav:hover{ color:var(--ink); }
+  #lightbox .lb-nav svg{ width:22px; height:22px; }
+  .lb-prev{ left:8px; } .lb-next{ right:8px; }
+  #lightbox .lb-count{
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    font-size:12px; color:var(--ink-soft);
+  }
+  .piece .meta-title{ font-size:13px; color:var(--ink); font-weight:600; margin-bottom:6px; }
+  .piece .meta-desc{ font-size:12.5px; color:var(--ink-soft); line-height:1.7; }
+  .piece video{ width:100%; display:block; background:#111; }
+
+  #view-intro{
+    display:none;
+    min-height:100vh;
+    padding:160px 40px 100px;
+  }
+  #view-intro.active{display:block;}
+  .intro-wrap{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:60px;
+    max-width:880px;
+  }
+  .intro-photo{
+    width:100%;
+    aspect-ratio:3/4;
+    overflow:hidden;
+  }
+  .intro-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .intro-text h2{ font-size:32px; font-weight:600; margin:0 0 20px; }
+  .intro-text p{ font-size:15px; line-height:1.85; color:var(--ink); max-width:56ch; margin:0 0 18px; white-space:pre-line; }
+  .intro-text .contact{ margin-top:32px; font-size:13.5px; color:var(--ink-soft); line-height:2; }
+  .intro-text .contact a{ color:var(--ink-soft); text-decoration:underline; text-underline-offset:2px; }
+  .intro-text .contact a:hover{ color:var(--ink); }
+  @media (max-width:700px){ .intro-wrap{ grid-template-columns:1fr; } .intro-photo{ max-width:220px; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="#" class="mark" id="logo-home">LYU MINGYANG</a>
+  <nav class="nav-links">
+    <a href="#" id="nav-work" data-i18n="nav_work">Work</a>
+    <a href="#" id="nav-intro" data-i18n="nav_intro">About</a>
+    <div class="lang-switch">
+      <button data-lang="en" class="active">EN</button><span>/</span>
+      <button data-lang="fr">FR</button><span>/</span>
+      <button data-lang="zh">中</button>
+    </div>
+  </nav>
+</div>
+
+<main id="view-home">
+  <div class="stage" id="stage">
+    <div id="track"></div>
+    <div class="edge-vignette"></div>
+  </div>
+
+  <div class="name-overlay" id="name-overlay">
+    <h1>Lyu Mingyang</h1>
+    <p data-i18n="name_tagline">Illustrator. Click the name for the intro, hover the wall to pause.</p>
+  </div>
+
+  <div class="scroll-hint">Lyu Mingyang © 2026 · hello@lyumingyang.art</div>
+</main>
+
+<section id="view-allwork">
+  <div class="allwork-intro">
+    <h2 data-i18n="allwork_heading">All Work</h2>
+    <p data-i18n="allwork_sub">Every series in one place. Hover a cover to preview, click to open.</p>
+  </div>
+  <div class="allwork-timeline" id="allwork-timeline"></div>
+</section>
+
+<section id="view-gallery">
+  <button class="back-btn" id="back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    <span data-i18n="back_btn">Back to all work</span>
+  </button>
+  <div class="series-head">
+    <h2 id="series-title"></h2>
+    <p class="meta-line" id="series-meta"></p>
+    <p id="series-desc"></p>
+  </div>
+  <div class="masonry" id="masonry"></div>
+  <div class="contact-sheet" id="contact-sheet"></div>
+</section>
+
+<div id="lightbox">
+  <button class="lb-close" id="lb-close">CLOSE</button>
+  <button class="lb-nav lb-prev" id="lb-prev">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <img id="lb-img" src="" alt="">
+  <video id="lb-video" controls playsinline></video>
+  <button class="lb-nav lb-next" id="lb-next">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <div class="lb-count" id="lb-count"></div>
+</div>
+
+<section id="view-intro">
+  <button class="back-btn" id="back-btn-intro">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    <span data-i18n="back_btn">Back to all work</span>
+  </button>
+  <div class="intro-wrap">
+    <div class="intro-photo" id="intro-photo"></div>
+    <div class="intro-text">
+      <h2 data-i18n="intro_heading">Hi, I'm Lyu Mingyang</h2>
+      <p id="intro-body"></p>
+      <div class="contact">
+        happylinghui11@gmail.com<br>
+        Instagram · <a href="https://www.instagram.com/taylorlmy?igsi=MWtweHA1ZzdwN2szNg%3D%3D&utm_source=qr" target="_blank" rel="noopener">@taylorlmy</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const SERIES = {"belaytionship": {"titleFixed": "BELAYTIONSHIP", "desc": {"en": "As an artist, I've always been fascinated by the subtle moments on the wall—trusting someone with your life, clinging to a tiny crimp with everything you've got, or fighting through an overhang until your forearms are completely pumped. Oddly enough, this hyper-technical climbing jargon describes our human relationships and emotions with poetic precision.\n\nBELAYTIONSHIP is a series where I blend climbing terminology with our inner feelings. Through bold, saturated pop colors and fluid silhouettes, I wanted to capture those absurd, romantic, and relatable moments that always make me smile. 🧗‍♀️✨", "fr": "En tant qu'artiste, j'adore observer ces petits moments sur le mur : on confie sa vie à quelqu'un, on s'accroche de toutes ses forces à quelques millimètres de prise, ou on lutte dans les dévers jusqu'à avoir les bras totalement \"bouteille\". Curieusement, ce jargon ultra-technique décrit nos relations humaines et nos émotions avec une précision presque poétique.\n\nBELAYTIONSHIP est une série où j'associe le vocabulaire de la grimpe à nos états d'esprit. À travers des couleurs pop très saturées et des silhouettes fluides, j'ai voulu capturer ces instants absurdes, intenses et romantiques qui me font tant sourire. 🧗‍♀️✨", "zh": "作为一个创作者，我一直很着迷于墙上的那些微妙瞬间：把生命托付给另一个人、死死抠住几毫米的微小岩点，或者在屋檐下拼尽全力直到小臂彻底暴胀。神奇的是，这些极度专业的攀岩术语，竟能以一种近乎诗意的方式精准勾勒出我们的人际关系与内心情绪。\n\n《BELAYTIONSHIP》这组插画将攀岩词汇与人类情感交织在了一起。我用高饱合度的 Pop 色彩和流畅的线条，记录下了这些既荒谬又浪漫、总能让人会心一笑的日常瞬间。 🧗‍♀️✨"}, "meta": null, "works": [{"thumb": "images/work-01-thumb.jpg", "full": "images/work-01-full.jpg"}, {"thumb": "images/work-02-thumb.jpg", "full": "images/work-02-full.jpg"}, {"thumb": "images/work-03-thumb.jpg", "full": "images/work-03-full.jpg"}, {"thumb": "images/work-04-thumb.jpg", "full": "images/work-04-full.jpg"}, {"thumb": "images/work-05-thumb.jpg", "full": "images/work-05-full.jpg"}, {"thumb": "images/work-06-thumb.jpg", "full": "images/work-06-full.jpg"}, {"thumb": "images/work-07-thumb.jpg", "full": "images/work-07-full.jpg"}, {"thumb": "images/work-08-thumb.jpg", "full": "images/work-08-full.jpg"}, {"thumb": "images/work-09-thumb.jpg", "full": "images/work-09-full.jpg"}, {"thumb": "images/work-10-thumb.jpg", "full": "images/work-10-full.jpg"}, {"thumb": "images/work-11-thumb.jpg", "full": "images/work-11-full.jpg", "title": {"en": "Safety Check", "fr": "Contrôle de Sécurité", "zh": "“你多重？”"}}, {"thumb": "images/work-12-thumb.jpg", "full": "images/work-12-full.jpg", "title": {"en": "Mid-Air Collision", "fr": "Collision en Plein Vol", "zh": "半空相遇"}}, {"thumb": "images/work-13-thumb.jpg", "full": "images/work-13-full.jpg", "title": {"en": "Hands-On Trust", "fr": "Contact Impromptu", "zh": "微妙触感"}}], "year": 2026}, "symbiosis": {"title": {"en": "Symbiosis", "fr": "Symbiose", "zh": "共生形态"}, "desc": {"en": "This series is my visual exploration of the \"raw animality\" inherent in human nature.\n\nUsing high-tension neon colors, I intertwine human postures with horns, wild horses, and botanical forms. I am fascinated by the shared state of humans and animals under the laws of nature—equally sensitive, breathing and struggling together within the cycle of birth, aging, sickness, and death. Here, the body is no longer an isolated entity, but a symbiotic vessel closely bound to and nurturing all living things.", "fr": "Cette série est une exploration visuelle de l’\"animalité brute\" ancrée au cœur de la nature humaine.\n\nÀ travers des couleurs néon pleines de tension, j'entrelace la posture humaine avec des cornes, des chevaux sauvages et des formes végétales. Je suis fasciné·e par cet état partagé entre l'humain et l'animal face aux lois de la nature — tout aussi sensibles, respirant et luttant ensemble dans le cycle de la naissance, du vieillissement, de la maladie et de la mort. Ici, le corps n'est plus un individu isolé, mais un vecteur symbiotique étroitement lié au vivant et nourri par lui.", "zh": "这组作品是我对人类本体中“原生动物性”的一场视觉探索。\n\n我用充满张力的荧光色彩，将人体姿态与兽角、野马及植物形态重叠缠绕。我着迷于人与动物共同置身于自然规律中的状态——我们同样敏感，同样在生老病死的循环里呼吸与挣扎。在这里，身体不再是独立的个体，而是与万物紧密依附、相互滋养的共生载体。"}, "meta": {"en": "2023 · Digital print, dimensions variable", "fr": "2023 · Tirage numérique, dimensions variables", "zh": "2023 · 数码版画，尺寸可变"}, "works": [{"thumb": "images/symb-01-thumb.jpg", "full": "images/symb-01-full.jpg", "title": {"en": "Horns, Bones & Breath", "fr": "Des Cornes et des Os", "zh": "骨角与生息"}}, {"thumb": "images/symb-02-thumb.jpg", "full": "images/symb-02-full.jpg", "title": {"en": "Wild Roar in the Waves", "fr": "Hennissement dans les Vagues", "zh": "嘶鸣与沉浮"}}, {"thumb": "images/symb-03-thumb.jpg", "full": "images/symb-03-full.jpg", "title": {"en": "In Bloom, In Decay", "fr": "L'Étreinte et la Floraison", "zh": "花海与终局"}}], "year": 2023}, "motion": {"title": {"en": "Motion Studio", "fr": "Études en mouvement", "zh": "影像习作"}, "desc": null, "meta": {"en": "2020", "fr": "2020", "zh": "2020"}, "works": [{"title": {"en": "Tactile Connection", "fr": "Contact Tactile", "zh": "触点"}, "desc": {"en": "Stripping away complex backgrounds, I focus on the rawest interaction of a body part. The blue hand and vibrant lines collide, capturing the subtle tension and physical instinct at the exact moment skin receives a touch.", "fr": "Dépouillé de tout décor complexe, je me concentre sur l'interaction la plus brute d'une partie du corps. La main bleue et les lignes vives se rencontrent, capturant la tension subtile et l'instinct physique au moment même où la peau reçoit le contact.", "zh": "剥离了复杂的背景，我将视线聚焦于身体局部最原始的互动。蓝色的手与鲜活的线条在绿幕上碰撞，试图捕捉皮肤在接受触碰那一刻，所引发的微妙张力与生理本能。"}, "video": "images/motion-01-tactile.mp4", "poster": "images/motion-01-tactile-poster.jpg"}, {"title": {"en": "Submerged", "fr": "Submersions", "zh": "微水"}, "desc": {"en": "In this animation, I use minimalistic lines to capture the rhythm of a body drifting, submerging, and resurfacing upon the water. Water is not merely a background, but a breathing medium enveloping the skin. I sought to reveal a fleeting, subtle, and serene state of existence amidst weightless flow.", "fr": "Dans cette animation, j'utilise des lignes minimalistes pour capturer le rythme d'un corps qui flotte, s'immerge et réapparaît à la surface de l'eau. L'eau n'est plus un simple décor, mais un fluide respirant qui enveloppe la peau. J'ai voulu révéler un état d'existence éphémère, subtil et serein au cœur d'un flux en apesanteur.", "zh": "在这段动画中，我用极简的线条记录下躯体在水面隐现、漂浮与下沉的节奏。水不再只是背景，而是一种包裹着肌肤的呼吸介质。我希望呈现生命在无重力的流动状态下，那种短暂、微妙而又宁静的存在感。"}, "video": "images/motion-02-submerged.mp4", "poster": "images/motion-02-submerged-poster.jpg"}], "year": 2020}, "exile": {"title": {"en": "Social Enclosures and Intimate Exile", "fr": "Les Enclos Sociaux et l'Exil Intime", "zh": "社会围笼与亲密流亡"}, "desc": {"en": "In this series, I examine the condition of modern human existence shaped by architectural spaces, geographical borders, and digital technologies. Through vivid neon palettes and fragmented geometric grids, I document the barriers in communication, the passive fragmentation of bodies through screens and algorithms, and the collective isolation within crowds. Enclosed by technology and architecture, we are all undergoing a silent yet profound intimate exile.", "fr": "À travers cette série, j'interroge les conditions d'existence de l'homme moderne dictées par l'architecture, la géographie et les technologies numériques. À l'aide de aplats de couleurs néon très saturés et de grilles géométriques morcelées, je capture les barrières de communication, la fragmentation passive des corps à travers les écrans et l'isolement collectif. Dans cet enclos façonné par la technologie, nous traversons tous un exil intime, silencieux mais profond.", "zh": "在这组创作中，我试图审视现代人在建筑空间、地理边界与数字科技重塑下的生存境况。我借助高饱和的荧光色块与被分割的立体网格，记录那些被无形屏障阻隔的沟通、被屏幕与算法被动撕碎的身体，以及身处人群却难以逃离的群体性孤独。在这片由科技与建筑筑起的围笼里，我们都在经历一场无声而深刻的亲密流亡。"}, "meta": {"en": "2024 · Digital illustration, dimensions variable", "fr": "2024 · Illustration numérique, dimensions variables", "zh": "2024 · 数码插画，尺寸可变"}, "works": [{"thumb": "images/exile-01-thumb.jpg", "full": "images/exile-01-full.jpg", "title": {"en": "Silent Thoughts", "fr": "Pensées Silencieuses", "zh": "寂念"}}, {"thumb": "images/exile-02-thumb.jpg", "full": "images/exile-02-full.jpg", "title": {"en": "The Core of Boundaries", "fr": "Le Cœur de la Frontière", "zh": "界心"}}, {"thumb": "images/exile-03-thumb.jpg", "full": "images/exile-03-full.jpg", "title": {"en": "Traces of Detachment", "fr": "L'Empreinte de l'Éloignement", "zh": "离印"}}, {"thumb": "images/exile-04-thumb.jpg", "full": "images/exile-04-full.jpg", "title": {"en": "Connection", "fr": "Connexion", "zh": "连接"}}, {"thumb": "images/exile-05-thumb.jpg", "full": "images/exile-05-full.jpg", "title": {"en": "Speculation", "fr": "Spéculation", "zh": "思辨"}}, {"thumb": "images/exile-06-thumb.jpg", "full": "images/exile-06-full.jpg", "title": {"en": "Contemplating the Self", "fr": "Méditation sur Soi", "zh": "思我"}}, {"thumb": "images/exile-07-thumb.jpg", "full": "images/exile-07-full.jpg", "title": {"en": "Three Awakenings", "fr": "Trois Éveils", "zh": "三觉"}}, {"thumb": "images/exile-08-thumb.jpg", "full": "images/exile-08-full.jpg", "title": {"en": "Non-Self", "fr": "Non-Soi", "zh": "欲迷 (无我)"}}, {"thumb": "images/exile-09-thumb.jpg", "full": "images/exile-09-full.jpg", "title": {"en": "With Fish", "fr": "Avec les Poissons", "zh": "与鱼"}}, {"thumb": "images/exile-10-thumb.jpg", "full": "images/exile-10-full.jpg", "title": {"en": "Consensus", "fr": "Le Consensus", "zh": "共识"}}, {"thumb": "images/exile-11-thumb.jpg", "full": "images/exile-11-full.jpg", "title": {"en": "The Self", "fr": "Le Soi", "zh": "自我"}}, {"thumb": "images/exile-12-thumb.jpg", "full": "images/exile-12-full.jpg", "title": {"en": "Metamorphic Body", "fr": "Le Corps Métamorphosé", "zh": "异躯"}}], "year": 2024}, "innerspaces": {"title": {"en": "Inner Spaces", "fr": "Espaces Intérieurs", "zh": "内部空间"}, "desc": {"en": "Felt Sculpture, Variable Dimensions, 2019\n\nIn this sculptural series, I create a sequence of mysterious internal organs, as if they belong to a parallel reality suspended between the real and the fantastical. I treat the interior of the body as an unknown and enigmatic territory, composed of peculiar substances and viscera—elements that subtly shape our brain, influence our perception and ways of thinking, and quietly inhabit the depths of our unconscious mind.", "fr": "Sculpture en feutre, dimensions variables, 2019\n\nDans cette série de sculptures, je façonne des organes internes mystérieux, comme s'ils appartenaient à une autre réalité, entre monde réel et monde fantastique. Je traite l'intérieur du corps comme un espace inconnu et mystérieux, fait de substances et de viscères étranges qui influenceraient notre cerveau, notre manière de percevoir et de penser, et habiteraient nos profondeurs inconscientes.", "zh": "羊毛毡雕塑，尺寸可变，2019年创作\n\n在这组雕塑创作中，我塑造了一系列神秘的内部器官，它们仿佛存在于现实与幻想交织的异度空间之中。我将身体的内部视为一片神秘而未知的领域，由奇特的物质与内脏所构成——它们潜移默化地塑造着我们的脑神经、影响着我们的感知与思维方式，并安然栖居于我们的潜意识深处。"}, "meta": {"en": "2019 · Felt sculpture, dimensions variable", "fr": "2019 · Sculpture en feutre, dimensions variables", "zh": "2019 · 羊毛毡雕塑，尺寸可变"}, "works": [{"thumb": "images/inner-01-thumb.jpg", "full": "images/inner-01-full.jpg"}, {"thumb": "images/inner-02-thumb.jpg", "full": "images/inner-02-full.jpg"}, {"thumb": "images/inner-03-thumb.jpg", "full": "images/inner-03-full.jpg"}, {"thumb": "images/inner-04-thumb.jpg", "full": "images/inner-04-full.jpg"}, {"thumb": "images/inner-05-thumb.jpg", "full": "images/inner-05-full.jpg"}, {"thumb": "images/inner-06-thumb.jpg", "full": "images/inner-06-full.jpg"}, {"thumb": "images/inner-07-thumb.jpg", "full": "images/inner-07-full.jpg"}, {"thumb": "images/inner-08-thumb.jpg", "full": "images/inner-08-full.jpg"}, {"thumb": "images/inner-09-thumb.jpg", "full": "images/inner-09-full.jpg"}, {"thumb": "images/inner-10-thumb.jpg", "full": "images/inner-10-full.jpg"}, {"thumb": "images/inner-11-thumb.jpg", "full": "images/inner-11-full.jpg"}, {"thumb": "images/inner-12-thumb.jpg", "full": "images/inner-12-full.jpg"}], "squareFit": true, "year": 2019}, "liquidfragments": {"title": {"en": "Liquid Fragments", "fr": "Fragments Liquides", "zh": "液体碎片"}, "desc": {"en": "Alcohol Markers on PVC\n\nThe use of alcohol-based markers on PVC creates a surface with toxic fluidity and artificial sheen. I seek to capture the tactile spectrum of intimacy, dissolving bodies within a flow of colors to reveal a raw and more vibrant emotional truth.", "fr": "Marqueurs à l'alcool sur PVC\n\nL'utilisation de marqueurs à l'alcool sur PVC crée une surface d'une fluidité toxique et d'une brillance artificielle. Je cherche à capturer le spectre tactile de l'intimité, en dissolvant les corps dans un flux de couleurs pour révéler une vérité émotionnelle plus brute et plus vibrante.", "zh": "PVC板材，酒精马克笔\n\n在PVC材料上使用酒精马克笔，能创造出一种带有毒素般流动感与人工光泽的画面肌理。我试图捕捉亲密关系中那些微妙的触觉光谱，将躯体溶解在色彩的流动之中，从而揭示出一种更加原始、更为鲜活的真实情感。"}, "meta": {"en": "2018 · Alcohol markers on PVC", "fr": "2018 · Marqueurs à l'alcool sur PVC", "zh": "2018 · PVC板材，酒精马克笔"}, "works": [{"thumb": "images/liquid-01-thumb.jpg", "full": "images/liquid-01-full.jpg"}, {"thumb": "images/liquid-02-thumb.jpg", "full": "images/liquid-02-full.jpg"}, {"thumb": "images/liquid-03-thumb.jpg", "full": "images/liquid-03-full.jpg"}], "year": 2018}, "cellophane": {"title": {"en": "What You See Is the World", "fr": "Ce que vous voyez, c'est le monde", "zh": "你所见到的，即是世界"}, "desc": {"en": "Marker and India Ink on Cellophane Paper, 2019\n\nI started working on transparent paper completely by chance. While using a marker, I noticed that it left its own unique texture. By layering multiple sheets, overlapping different drawings and textures, I discovered that I could explore a new visual language where the depicted figures and elements became more uncertain and mysterious.\n\nSimilarly, as the colors overlap, they gradually darken and sometimes even disappear altogether, creating a deep black in the places with the thickest layers. For me, this process is endlessly captivating.\n\nI cannot control how viewers perceive my drawings, but I hope those who wonder about what they are looking at will linger a little longer, attempting to uncover what lies beneath the first layer of the image, then what comes next, and so on, through the depth of the layers. In a way, it is like a game—a game I offer to the public, with the audience as the players.", "fr": "Marqueur et encre de Chine sur papier cellophane, 2019\n\nJe me suis mise à travailler par hasard sur du papier transparent. En utilisant un marqueur, j'ai constaté qu'il laissait sa propre texture, et en superposant plusieurs feuilles, en chevauchant plusieurs dessins et textures, j'ai découvert que je pouvais explorer un nouveau langage où les figures et les éléments représentés devenaient plus incertains et mystérieux.\n\nDe même les couleurs, en se chevauchant, s'assombrissent progressivement et même parfois vont jusqu'à disparaître, formant une couleur noire dans les endroits où il y a la plus grande épaisseur de couches. C'est infiniment amusant pour moi.\n\nJe ne peux pas contrôler la façon dont les spectateurs reçoivent mes dessins, mais j'espère que ceux qui s'interrogent sur ce qu'ils regardent restent plus longtemps devant pour essayer de mieux comprendre, découvrant ce qui se cache sous la première couche de l'image, puis ce qui vient après et ainsi de suite, sous l'épaisseur des couches. Cela peut s'apparenter à un jeu, un jeu que je propose au public, avec le public comme joueur.", "zh": "玻璃纸，酒精马克笔与水墨，2019年创作\n\n我开始在透明纸上创作纯属偶然。在画画时，我发现马克笔会留下一层独特的肌理，而通过叠加多层薄膜、重叠不同的线条与纹理，我开启了一种全新的视觉语言——原本明确的形象与元素变得隐约而充满神秘感。\n\n同样，色彩在相互重叠中逐渐加深，有时甚至趋于沉寂，在叠压最厚重的地方凝结成一片深邃的黑色。对我而言，这个探索过程有着无穷的乐趣。\n\n我无法控制观众将如何解读我的作品，但我希望那些怀有好奇的人能停下脚步，在画面前驻留得更久一些，去凝视并试图看透第一层图像之下隐藏着什么，接着是下一层，如此往复，穿透那层层叠加的厚度。这或许就像一场游戏，一场由我发起、邀请观众共同参与的游戏。"}, "meta": {"en": "2019 · Marker and India ink on cellophane paper", "fr": "2019 · Marqueur et encre de Chine sur papier cellophane", "zh": "2019 · 玻璃纸，酒精马克笔与水墨"}, "works": [{"thumb": "images/cello-01-thumb.jpg", "full": "images/cello-01-full.jpg"}, {"thumb": "images/cello-02-thumb.jpg", "full": "images/cello-02-full.jpg"}, {"thumb": "images/cello-03-thumb.jpg", "full": "images/cello-03-full.jpg"}, {"thumb": "images/cello-04-thumb.jpg", "full": "images/cello-04-full.jpg"}, {"thumb": "images/cello-05-thumb.jpg", "full": "images/cello-05-full.jpg"}, {"thumb": "images/cello-06-thumb.jpg", "full": "images/cello-06-full.jpg"}, {"thumb": "images/cello-07-thumb.jpg", "full": "images/cello-07-full.jpg"}, {"thumb": "images/cello-08-thumb.jpg", "full": "images/cello-08-full.jpg"}, {"thumb": "images/cello-09-thumb.jpg", "full": "images/cello-09-full.jpg"}, {"thumb": "images/cello-10-thumb.jpg", "full": "images/cello-10-full.jpg"}], "year": 2019}, "desrives": {"title": {"en": "Along the Riverbanks: Passing Intimacies", "fr": "Des Rives : Intimités en Passant", "zh": "沿岸速写：路过他人的亲密"}, "desc": {"en": "As an observer, I wander along riverbanks and beneath tree shades, capturing subtle fragments of everyday life through my sketches—couples embracing, quiet figures resting on benches, sparkling ripples, and playful dogs. In these drawings, I place myself (\"Moi\") quietly in the corners, intertwining realistic scenes with dreamlike close-up frames. This series is not only a sketchbook of urban life, but also a gentle gaze upon intimacy, warmth, and the poetry of the mundane.", "fr": "En tant qu'observateur, j'aime flâner le long des rives et sous l'ombre des arbres, capturant sur le vif de subtils fragments du quotidien : des couples qui s'étreignent, des silhouettes qui se reposent sur un banc, le scintillement de l'eau et des chiens joyeux. Dans ces compositions, je me glisse discrètement (\"Moi\") dans un coin, entrelacant scènes de vie et fenêtres de détails presque oniriques. Cette série est autant un carnet de croquis urbains qu'un regard doux porté sur l'intimité, la chaleur humaine et la poésie de tous les jours.", "zh": "作为一名观察者，我习惯漫步在城市的河流旁与树荫下，用画笔捕捉那些属于他人的微妙日常——路边相拥的伴侣、长椅上小憩的背影、水面上掠过的波光与欢快的小狗。在这些画面里，我把自己（“Moi”）也静静置于角落，将写实的情景与梦幻的特写框相互交织。这不仅是对城市生活片段的速写，更是我对人与人之间亲密、温度与日常诗意的一次温柔注视。"}, "meta": {"en": "2026 · Digital illustration, dimensions variable", "fr": "2026 · Illustration numérique, dimensions variables", "zh": "2026 · 数码插画，尺寸可变"}, "works": [{"thumb": "images/rives-01-thumb.jpg", "full": "images/rives-01-full.jpg", "title": {"en": "Sunlight and Leisure", "fr": "Paresse au Soleil", "zh": "阳光与闲暇"}}, {"thumb": "images/rives-02-thumb.jpg", "full": "images/rives-02-full.jpg", "title": {"en": "Riverbank", "fr": "au Bord de l'Eau", "zh": "河畔"}}, {"thumb": "images/rives-03-thumb.jpg", "full": "images/rives-03-full.jpg", "title": {"en": "The Observer", "fr": "L'Observateur", "zh": "观者"}}], "year": 2026}, "shoresclimb": {"title": {"en": "Des Rives", "fr": "Des Rives", "zh": "沿岸"}, "desc": {"en": "During my ascents, I have encountered tiny living beings. Upon this terrestrial skin, our intrusion is a colossal disruption that disturbs their vertical sanctuary. Out of this sense of guilt, this series was born: an act of reparation where animal flesh fuses with the landscape. Here, \"the sea is a mountain of waves, and the mountain is a sea of geological time.\"\n\nIt is when one lives the raw experience of locking fingers into the rock, under the painful friction of chalk, with every fiber of the body stretched to its extreme under the weight of gravity, that one finally comprehends the meaning of the word Respect. We never conquer a route; we are simply fortunate enough to be temporarily accepted by the mountain.\n\nBy breaking through geometric frames, my tiny figures negotiate their way along this cosmic skin to rise beyond the horizon, carrying our hope and gratitude to the stars.", "fr": "Lors de mes ascensions, j'ai croisé de minuscules êtres. Sur cet épiderme terrestre, notre irruption est une effraction colossale qui perturbe leur sanctuaire vertical. De cette culpabilité naît cette série : un acte de réparation où la chair animale fusionne avec le paysage. Ici, « la mer est une montagne de vagues, la montagne est une mer du temps géologique ».\n\nC'est lorsque l'on vit l'expérience brute de verrouiller les doigts dans le rocher, sous la friction douloureuse de la magnésie, et que chaque fibre du corps est tendue à l'extrême sous le poids de la gravité, que l'on comprend enfin le sens du mot Respect. Nous ne conquérons jamais une voie ; nous avons simplement de la chance d'être temporairement acceptés par la montagne.\n\nEn brisant les cadres géométriques, mes personnages minuscules négocient leur passage le long de cet épiderme cosmique pour s'élever au-delà de l'horizon, emportant notre espoir et notre gratitude jusqu'aux étoiles.", "zh": "在攀登的过程中，我曾与无数微小的生灵相遇。在这片地球的“表皮”之上，我们的闯入是一场巨大人为的入侵，扰乱了属于它们的垂直圣所。正是在这份愧疚感中，诞生了这个系列——一次对自然的补救与修复之举，让动物的肉身与地貌景观在此融合。在这里，“大海是波浪凝聚的山脉，山脉则是地质时间凝结的大海”。\n\n只有当你在岩壁上亲历最原始的体验——将手指卡入岩缝，承受镁粉摩擦带来的灼痛，全身每根纤维都在重力之下绷紧至极限时，你才能真正理解“敬畏”二字的含义。我们从未征服过任何一条线路，我们只是足够幸运，被山脉短暂地接纳。\n\n通过打破几何框线，我笔下微小的人形在这片宇宙表皮上寻觅着前行的路径，向着地平线之外攀升，带着我们的希望与感激，一直延伸至星空深处。"}, "meta": {"en": "2026 · Digital illustration, dimensions variable", "fr": "2026 · Illustration numérique, dimensions variables", "zh": "2026 · 数码插画，尺寸可变"}, "works": [{"thumb": "images/shores-01-thumb.jpg", "full": "images/shores-01-full.jpg", "title": {"en": "The Ascension of Gentleness", "fr": "L'Ascension de la Douceur", "zh": "柔情之升"}}, {"thumb": "images/shores-02-thumb.jpg", "full": "images/shores-02-full.jpg", "title": {"en": "The Awakening of Sea Giants", "fr": "L'Éveil des Géants des Mers", "zh": "深海巨兽的觉醒"}}, {"thumb": "images/shores-03-thumb.jpg", "full": "images/shores-03-full.jpg", "title": {"en": "The Path of Terrestrial Stars", "fr": "La Route des Étoiles Terrestres", "zh": "尘世繁星之路"}}, {"thumb": "images/shores-04-thumb.jpg", "full": "images/shores-04-full.jpg", "title": {"en": "Twilight of the Green Angel", "fr": "Le Crépuscule de l'Ange Vert", "zh": "绿天使的黄昏"}}, {"thumb": "images/shores-05-thumb.jpg", "full": "images/shores-05-full.jpg", "title": {"en": "The Guardian of the Blue Forest", "fr": "Le Gardien de la Forêt Bleue", "zh": "蓝森林的守卫者"}}, {"thumb": "images/shores-06-thumb.jpg", "full": "images/shores-06-full.jpg", "title": {"en": "The Butterfly's Secret", "fr": "Le Secret du Papillon", "zh": "蝴蝶的秘密"}}, {"thumb": "images/shores-07-thumb.jpg", "full": "images/shores-07-full.jpg", "title": {"en": "The Celestial Acrobatics", "fr": "Les Voltigeurs Célestes", "zh": "天空特技者"}}, {"thumb": "images/shores-08-thumb.jpg", "full": "images/shores-08-full.jpg", "title": {"en": "Whispers in the Pine Forest", "fr": "Le Dialogue du Châtaignier", "zh": "栗林对话"}}, {"thumb": "images/shores-09-thumb.jpg", "full": "images/shores-09-full.jpg", "title": {"en": "The Embrace of the Furrowed Caterpillar", "fr": "L'Étreinte du Chenille-Sillon", "zh": "褶脊毛虫之拥"}}], "year": 2026}, "sketchbook": {"title": {"en": "Sketchbook Drawings", "fr": "Série de dessins carnet", "zh": "速写日记"}, "desc": {"en": "Image extracted from the Sketchbook Drawings series.\n\nThis is an ongoing project I have been working on since 2017 as a continuous visual report of my life. I record the dates and locations on each piece because, to me, these drawings function as a private journal. This series combines painting with writing—for me, words and colors are remarkably similar tools that allow me to anchor my feelings of a given moment, ultimately building a personal archive to preserve those memories.\n\nBeyond this intimate dimension, however, I reprinted these pictorial materials onto transparent sheets and installed them in space, suspended like a cluster of scattered, chaotic clouds. Through this spatial arrangement, I sought to express how time and memory reside within the human mind in a fragmented, incomplete, and non-linear fashion—overlapping in utter confusion. In other words, the beginning of one story might blur into the end of another, constructing an entirely new narrative, or one emotion might seamlessly dissolve into another.", "fr": "Image extraite de la série de dessins carnet.\n\nC'est un projet sur lequel je travaille depuis 2017, en tant que compte-rendu permanent de ma vie. J'indique les dates et les lieux car ces dessins sont pour moi un journal intime. Il n'y a pas que de la peinture dans cette série, il y a aussi de l'écriture. Les mots et la peinture sont pour moi des choses très similaires qui me permettent d'enregistrer mon sentiment de l'époque, construisant ainsi une sorte d'archive personnelle qui en gardera la mémoire.\n\nMais, au-delà de cet aspect personnel, j'ai réimprimé ce matériau pictural sur des transparents, puis je les ai montés dans l'espace à la manière d'un ensemble de nuages dispersés et désordonnés. Par cette forme, j'ai voulu traduire que le temps, la mémoire, les souvenirs, habitent le cerveau d'une manière désordonnée, qu'ils sont parcellaires, incomplets, émiettés, dans une chronologie chaotique, se chevauchant parfois dans une grande confusion. Autrement dit, le début d'une histoire peut se confondre parfois avec la fin d'une autre histoire, et construire ainsi une nouvelle histoire ; ou encore une émotion peut se fondre dans une autre.", "zh": "本图片选自《速写日记》系列。\n\n这是我自2017年起持续创作的一个项目，也是我生命轨迹的一份即时记录。我在每一幅作品上标明日期与地点，因为对而言，这些手稿便是一部私人日记。这一系列不仅包含了绘画，也融合了文字。对我来说，文字与色彩是极为相似的媒介，它们帮我凝固当时的切身感受，进而构建出一份属于个人的记忆档案。\n\n然而，在私密日记的层面之外，我将这些绘画素材重新印制在透明胶片上，并以一种看似散乱无序的“云群”形式悬挂重组于空间之中。我想借由这种形式去呈现：时间、记忆与追忆在人类大脑中的存在方式往往是错乱无章的。它们是零碎的、残缺的、剥落的，遵循着混沌的时间线，甚至在极度的混杂中彼此重叠。换言之，一段故事的开头可能会与另一段故事的结尾重合，从而演变成全新的叙事；一种情绪亦会悄然融进另一种情绪之中。"}, "meta": {"en": "Ongoing since 2017 · Marker and ink, reprinted on transparency", "fr": "Depuis 2017 · Marqueur et encre, réimprimé sur transparent", "zh": "2017年至今 · 马克笔与墨水，印于透明胶片"}, "displayMode": "contactsheet", "works": [{"thumb": "images/sketch-01-thumb.jpg", "full": "images/sketch-01-full.jpg"}, {"thumb": "images/sketch-02-thumb.jpg", "full": "images/sketch-02-full.jpg"}, {"thumb": "images/sketch-03-thumb.jpg", "full": "images/sketch-03-full.jpg"}, {"thumb": "images/sketch-04-thumb.jpg", "full": "images/sketch-04-full.jpg"}, {"thumb": "images/sketch-05-thumb.jpg", "full": "images/sketch-05-full.jpg"}, {"thumb": "images/sketch-06-thumb.jpg", "full": "images/sketch-06-full.jpg"}, {"thumb": "images/sketch-07-thumb.jpg", "full": "images/sketch-07-full.jpg"}, {"thumb": "images/sketch-08-thumb.jpg", "full": "images/sketch-08-full.jpg"}, {"thumb": "images/sketch-09-thumb.jpg", "full": "images/sketch-09-full.jpg"}, {"thumb": "images/sketch-10-thumb.jpg", "full": "images/sketch-10-full.jpg"}, {"thumb": "images/sketch-11-thumb.jpg", "full": "images/sketch-11-full.jpg"}, {"thumb": "images/sketch-12-thumb.jpg", "full": "images/sketch-12-full.jpg"}, {"thumb": "images/sketch-13-thumb.jpg", "full": "images/sketch-13-full.jpg"}, {"thumb": "images/sketch-14-thumb.jpg", "full": "images/sketch-14-full.jpg"}, {"thumb": "images/sketch-15-thumb.jpg", "full": "images/sketch-15-full.jpg"}, {"thumb": "images/sketch-16-thumb.jpg", "full": "images/sketch-16-full.jpg"}, {"thumb": "images/sketch-17-thumb.jpg", "full": "images/sketch-17-full.jpg"}, {"thumb": "images/sketch-18-thumb.jpg", "full": "images/sketch-18-full.jpg"}, {"thumb": "images/sketch-19-thumb.jpg", "full": "images/sketch-19-full.jpg"}, {"thumb": "images/sketch-20-thumb.jpg", "full": "images/sketch-20-full.jpg"}, {"thumb": "images/sketch-21-thumb.jpg", "full": "images/sketch-21-full.jpg"}, {"thumb": "images/sketch-22-thumb.jpg", "full": "images/sketch-22-full.jpg"}, {"thumb": "images/sketch-23-thumb.jpg", "full": "images/sketch-23-full.jpg"}, {"thumb": "images/sketch-24-thumb.jpg", "full": "images/sketch-24-full.jpg"}, {"thumb": "images/sketch-25-thumb.jpg", "full": "images/sketch-25-full.jpg"}, {"thumb": "images/sketch-26-thumb.jpg", "full": "images/sketch-26-full.jpg"}, {"thumb": "images/sketch-27-thumb.jpg", "full": "images/sketch-27-full.jpg"}, {"thumb": "images/sketch-28-thumb.jpg", "full": "images/sketch-28-full.jpg"}, {"thumb": "images/sketch-29-thumb.jpg", "full": "images/sketch-29-full.jpg"}, {"thumb": "images/sketch-30-thumb.jpg", "full": "images/sketch-30-full.jpg"}, {"thumb": "images/sketch-31-thumb.jpg", "full": "images/sketch-31-full.jpg"}, {"thumb": "images/sketch-32-thumb.jpg", "full": "images/sketch-32-full.jpg"}, {"thumb": "images/sketch-33-thumb.jpg", "full": "images/sketch-33-full.jpg"}, {"thumb": "images/sketch-34-thumb.jpg", "full": "images/sketch-34-full.jpg"}, {"thumb": "images/sketch-35-thumb.jpg", "full": "images/sketch-35-full.jpg"}], "squareFit": true, "year": 2026}, "blackbird": {"title": {"en": "Thirteen Ways of Looking at a Blackbird", "fr": "Treize Façons de Regarder un Merle", "zh": "观察黑鸟的十三种方式"}, "desc": {"en": "This series is inspired by Wallace Stevens' iconic poem, Thirteen Ways of Looking at a Blackbird. In these works, I translate the poem's minimalistic imagery, Imagist precision, and philosophical meditations on perception into a visual realm.\n\nThe blackbird is not merely a creature, but a fissure through which we observe reality and self-consciousness. By embedding the silhouette of the blackbird into human forms, trees, and watchful eyes, I explore the dissolution of boundaries—where \"a man, a woman, and a blackbird are one.\" Here, the distinction between subject and object, observer and observed, vanishes into a quiet, primal resonance of existence.", "fr": "Cette série s'inspire du poème éponyme de Wallace Stevens, Treize Façons de Regarder un Merle. À travers ces créations, j'ai cherché à transposer en langage visuel l'imagerie minimaliste de l'œuvre, la précision imagiste et sa méditation philosophique sur la perception et l'existence.\n\nLe merle n'est pas seulement un oiseau, mais une fente par laquelle s'observent le monde et la conscience de soi. En enchâssant la silhouette de l'oiseau dans des formes humaines, des arbres et des regards fixes, j'interroge la dissolution des frontières : « Un homme, une femme et un merle ne font qu'un ». Ici, la limite entre sujet et objet, observateur et observé, s'efface pour laisser place à une résonance existentielle poétique et primordiale.", "zh": "这组创作灵感源自华莱士·史蒂文斯（Wallace Stevens）的同名诗篇《观察黑鸟的十三种方式》。在这些作品中，我试图将诗歌中极简的意象、意象派的凝练感以及对“感知与存在”的哲思转化为视觉语言。\n\n黑鸟不仅是一只鸟，更是观察世界与自我意识的一道裂隙。通过将黑鸟的轮廓嵌入人体、树木与凝视的眼睛之中，我探讨了物我界限的消解——“男人、女人与黑鸟是一体的”。在这里，主体与客体、观察者与被观察者的界限被抹去，呈现出一种原始而微观的生命共振。"}, "meta": {"en": "2018 · Mixed media / ink illustration, dimensions variable", "fr": "2018 · Technique mixte / illustration à l'encre, dimensions variables", "zh": "2018 · 数码插画，尺寸可变"}, "works": [{"thumb": "images/blackbird-01-thumb.jpg", "full": "images/blackbird-01-full.jpg", "title": {"en": "A Man, A Woman, A Blackbird", "fr": "Un Homme, Une Femme, Un Merle", "zh": "人与黑鸟为一"}}, {"thumb": "images/blackbird-02-thumb.jpg", "full": "images/blackbird-02-full.jpg", "title": {"en": "The Eye of the Blackbird", "fr": "L'Œil du Merle", "zh": "黑鸟之眼"}}, {"thumb": "images/blackbird-03-thumb.jpg", "full": "images/blackbird-03-full.jpg", "title": {"en": "Three Minds, Like a Tree", "fr": "Trois Pensées, Comme un Arbre", "zh": "三重心念，如树"}}, {"thumb": "images/blackbird-04-thumb.jpg", "full": "images/blackbird-04-full.jpg", "title": {"en": "Whirled in the Wind", "fr": "Tourbillonnant dans le Vent", "zh": "风中盘旋"}}, {"thumb": "images/blackbird-05-thumb.jpg", "full": "images/blackbird-05-full.jpg", "title": {"en": "Two Are One", "fr": "Deux ne Font Qu'un", "zh": "二者为一"}}, {"thumb": "images/blackbird-06-thumb.jpg", "full": "images/blackbird-06-full.jpg", "title": {"en": "What the Heart Knows", "fr": "Ce que Sait le Cœur", "zh": "心之所知"}}], "year": 2018}, "sweetdissolution": {"title": {"en": "Sweet Dissolution", "fr": "La Douce Dissolution", "zh": "甘甜的消解"}, "desc": {"en": "In this project, I used Playmobil molds to cast chocolate human figurines and placed them directly into natural outdoor environments.\n\nChocolate, as a material, possesses both the artificial sweetness and plasticity of human production, while remaining highly susceptible to its surroundings. Through my camera, I documented the process of these chocolate figures being swarmed, consumed, fragmented, and eventually reintegrated into nature by ants. Here, the human symbol forfeits its inherent order and completeness, transforming into nutrients within a microscopic ecosystem. This work is not only a miniature performance of mortality and time, but also a gentle inquiry into the delicate relationship between human artifacts and natural laws.", "fr": "Dans ce projet, j'ai utilisé des moules Playmobil pour couler des figurines en chocolat, que j'ai ensuite déposées dans un environnement naturel sauvage.\n\nLe chocolat, en tant que matériau, incarne la douceur artificielle et la plasticité de l'industrie humaine, tout en étant extrêmement vulnérable aux éléments. À travers l'objectif, j'ai documenté la dégradation de ces silhouettes sucrées, colonisées, grignotées et progressivement déconstruites par des fourmis jusqu'à leur disparition. Le symbole humain y perd son ordre initial pour devenir un nutriment au cœur d'un micro-écosystème. Cette œuvre constitue autant une performance miniature sur le temps et la finitude qu'un regard poétique sur le rapport entre création artificielle et lois de la nature.", "zh": "在这组作品中，我利用 Playmobil 玩具模具将巧克力翻制成小人雕像，并将其置于真实的自然户外环境中。\n\n巧克力这种材料兼具人类制造的“甜美”与“可塑性”，同时又极易受到环境的影响。通过镜头，我记录下了这些巧克力小人被蚂蚁聚集、蚕食、分解，并逐步回归大自然的过程。人类符号在这里失去了其固有的秩序与完整性，转而成为微观生态循环中的养分。这不仅是一场关于消亡与时间的微观行为演替，更是对人工造物与自然法则之间微妙关系的一次温柔审视。"}, "meta": {"en": "2018 · Installation, performance & photographic documentation", "fr": "2018 · Installation, performance et documentation photographique", "zh": "2018 · 装置、行为与摄影记录"}, "works": [{"thumb": "images/sweet-01-thumb.jpg", "full": "images/sweet-01-full.jpg"}, {"thumb": "images/sweet-02-thumb.jpg", "full": "images/sweet-02-full.jpg"}, {"thumb": "images/sweet-03-thumb.jpg", "full": "images/sweet-03-full.jpg"}, {"thumb": "images/sweet-04-thumb.jpg", "full": "images/sweet-04-full.jpg"}, {"thumb": "images/sweet-05-thumb.jpg", "full": "images/sweet-05-full.jpg"}, {"thumb": "images/sweet-06-thumb.jpg", "full": "images/sweet-06-full.jpg"}, {"thumb": "images/sweet-07-thumb.jpg", "full": "images/sweet-07-full.jpg"}, {"thumb": "images/sweet-08-thumb.jpg", "full": "images/sweet-08-full.jpg"}], "year": 2018}, "fleshandwild": {"title": {"en": "Flesh and the Wild", "fr": "La Chair et le Sauvage", "zh": "肉身与荒野"}, "desc": {"en": "In this series, I explore the raw, intense, yet vulnerable connection between the human body and the natural world.\n\nI place figures full of physical tension and desire within vast landscapes, intertwining them with flora, wings, and darkened horizons. The uncontrolled, dripping traces of black ink function like wind, rain, or the passage of time—gradually eroding and dissolving the defined boundaries of the human form. To me, the body is never separate from nature; bound by irreversible natural laws, human existence undergoes the same cycle of growth, fusion, deconstruction, and ultimate return to the wild as all living things.", "fr": "À travers cette série, j'explore le lien viscéral, intense et vulnérable qui unit le corps humain au monde naturel.\n\nJ'immerge des silhouettes empreintes de tension physique et de désir au cœur de paysages vastes, les entrelaçant avec des fleurs, des ailes et des horizons crépusculaires. Les coulures d'encre imprévisibles agissent comme le vent, la pluie ou l'érosion du temps, dissolvant progressivement les contours du corps. Pour moi, le corps n'a jamais été séparé de la nature : soumis aux lois inéluctables du vivant, l'être humain traverse les mêmes cycles de croissance, de fusion, de déconstruction et de retour à l'état sauvage que tout ce qui l'entoure.", "zh": "在这组创作中，我试图探索人类肉体与大自然之间那种原始、剧烈而又脆弱的联系。\n\n我将充满肌肉张力与欲望的躯体置于天地之间，与花卉、羽翼及昏暗的地平线交织在一起。画面中肆意流淌与渗化的墨痕，犹如狂风、暴雨或时间的痕迹，逐渐侵蚀并融化了人类身体原本明确的界限。对我而言，肉体从来不是独立于自然之外的存在——在不可逆的自然法则面前，人与万物一样，都在经历着生长、交融、解构与最终回归荒野的过程。"}, "meta": {"en": "2019 · Oil, ink, and mixed media on canvas", "fr": "2019 · Huile, encre et techniques mixtes sur toile", "zh": "2019 · 布面油画、水墨及综合材料"}, "homeWallExclude": true, "works": [{"thumb": "images/flesh-01-thumb.jpg", "full": "images/flesh-01-full.jpg", "title": {"en": "Fall into the Wild", "fr": "Chute dans le Sauvage", "zh": "堕入荒野"}}, {"thumb": "images/flesh-02-thumb.jpg", "full": "images/flesh-02-full.jpg", "title": {"en": "Curled Existence", "fr": "Corps Lové", "zh": "生命的蜷缩"}}, {"thumb": "images/flesh-03-thumb.jpg", "full": "images/flesh-03-full.jpg", "title": {"en": "The Vein Bloom", "fr": "Éclosion Organique", "zh": "血脉绽放"}}, {"thumb": "images/flesh-04-thumb.jpg", "full": "images/flesh-04-full.jpg", "title": {"en": "Encroaching Night", "fr": "Ombre Lapping", "zh": "夜色侵袭"}}, {"thumb": "images/flesh-05-thumb.jpg", "full": "images/flesh-05-full.jpg", "title": {"en": "The Weight of Earth", "fr": "Le Poids de la Terre", "zh": "重负"}}, {"thumb": "images/flesh-06-thumb.jpg", "full": "images/flesh-06-full.jpg", "title": {"en": "Red Line and Feather", "fr": "Le Fil Rouge et l'Envol", "zh": "赤线与飞羽"}}, {"thumb": "images/flesh-07-thumb.jpg", "full": "images/flesh-07-full.jpg", "title": {"en": "Nature's Baptism", "fr": "Le Baptême Sauvage", "zh": "受洗"}}, {"thumb": "images/flesh-08-thumb.jpg", "full": "images/flesh-08-full.jpg", "title": {"en": "Traces of Time", "fr": "Les Sillons du Temps", "zh": "时间流痕"}}, {"thumb": "images/flesh-09-thumb.jpg", "full": "images/flesh-09-full.jpg", "title": {"en": "Still Ridge", "fr": "Silhouette de la Montagne", "zh": "静止的山丘"}}], "year": 2019}, "overlappingrealities": {"title": {"en": "Overlapping Realities: Digital Intrusions into Urban Space", "fr": "Chevauchement des Réalités : Intrusions Numériques dans l'Espace Urbain", "zh": "虚实重叠：城市空间的数字侵入"}, "desc": {"en": "In this series of Augmented Reality (AR) works, I employ digital media to seamlessly stitch 3D sculptural entities—ranging from a giant virtual head with iridescent textures and alien features, to vibrant organ-like geometric tunnels—directly into real-world urban streets and public spaces.\n\nWhen viewed through a screen, the familiar, mundane urban landscape (streets, architecture, passersby) collides with absurd and uncanny digital forms. Floating above physical reality like mysterious spectral thresholds or projections of consciousness, these virtual sculptures dissolve the rigid boundaries between the physical and the digital. Through this, I explore how virtual bodies and digital realms silently infiltrate and reshape our perception of public space and reality in an increasingly technology-saturated world.", "fr": "Dans cette série d'œuvres en réalité augmentée (RA), j'utilise les technologies numériques pour greffer des sculptures 3D virtuelles — une tête géante aux reflets iridescents et aux traits étranges, ou encore un canal chromatique et organique en gestation — au cœur des rues urbaines et des espaces quotidiens.\n\nÀ travers l'écran, le paysage urbain familier (rues, architectures, passants) entre en collision avec des formes numériques absurdes et fantastiques. Flottant au-dessus de la réalité physique comme des apparitions ou des projections de la conscience, ces sculptures virtuelles effacent la frontière entre le physique et le numérique. J'interroge ainsi la façon dont les corps virtuels et l'espace numérique s'infiltrent silencieusement dans notre quotidien, réinventant notre perception de l'espace public et du monde réel.", "zh": "在这组增强现实（AR）作品中，我利用数字技术将原本仅存在于虚拟屏幕中的3D雕塑形态——无论是带着异质光泽与神秘面孔的巨大虚拟人头，还是内部不断蠕动、生长的器官状色彩通道——强行缝合进现实中的城市街道与日常空间。\n\n当观众透过镜头观察时，熟悉日常的公共空间（街道、建筑、行人）与荒诞奇特的数字实体发生碰撞。这些虚拟雕塑如同浮现在物理现实之上的神秘“结界”或意识投影，打破了现实与虚拟的绝对边界。我试图借此探讨在数字科技高度渗透的当下，人类的意识形态、虚拟躯体是如何悄无声息地侵入、重塑我们对公共空间与真实世界的感知。"}, "meta": {"en": "2022 · AR (Augmented Reality) interactive installation", "fr": "2022 · Installation interactive en Réalité Augmentée (RA)", "zh": "2022 · AR 增强现实交互装置"}, "homeWallImage": "images/ar-03-pensee-thumb.jpg", "works": [{"video": "images/ar-01-overview.mp4", "poster": "images/ar-01-overview-poster.jpg", "title": {"en": "Overlapping Realities — Documentation Reel", "fr": "Chevauchement des Réalités — Film Documentaire", "zh": "虚实重叠 · 纪录片段"}, "desc": {"en": "A compiled excerpt weaving together the two AR pieces in situ — the giant virtual head on a Paris street, its DNA strands, reaching hand, and root-like neural forms.", "fr": "Un montage réunissant les deux œuvres en RA in situ — la tête virtuelle géante dans une rue parisienne, ses brins d'ADN, sa main tendue et ses formes neuronales racinaires.", "zh": "汇集两件 AR 作品实地影像的剪辑片段——巴黎街头的巨大虚拟头像、DNA 螺旋、伸出的手，以及根须状的神经形态。"}}, {"video": "images/ar-02-pensee-onsite.mp4", "poster": "images/ar-02-pensee-onsite-poster.jpg", "title": {"en": "Le Dedans de la Pensée — On Site", "fr": "Le Dedans de la Pensée — En Situ", "zh": "《思想内部》· 现场实拍"}, "desc": {"en": "Raw AR capture: entering the interior of the piece, where a cloud-like drawn face and floating hand-inked forms hover inside a hallucinatory, textured room.", "fr": "Capture brute en RA : à l'intérieur de l'œuvre, un visage dessiné en forme de nuage et des formes tracées à l'encre flottent dans une pièce texturée et hallucinatoire.", "zh": "AR 原始录制：进入作品内部，云朵状的手绘面孔与漂浮的墨线形态悬浮在一间充满幻觉质感的房间中。"}}, {"thumb": "images/ar-03-pensee-thumb.jpg", "full": "images/ar-03-pensee-full.gif", "title": {"en": "Le Dedans de la Pensée", "fr": "Le Dedans de la Pensée", "zh": "思想内部"}, "desc": {"en": "The original digital asset: a bald head rendered in translucent gradients, its brain exposed and glowing, encircled by the piece's French title.", "fr": "L'asset numérique original : une tête chauve aux dégradés translucides, cerveau exposé et lumineux, encerclée par le titre de l'œuvre.", "zh": "原始数字素材：一颗以半透明渐变绘制的光头，大脑外露并发光，四周环绕着作品的法文标题。"}}, {"video": "images/ar-04-grotte-onsite.mp4", "poster": "images/ar-04-grotte-onsite-poster.jpg", "title": {"en": "Grotte de Mai — On Site", "fr": "Grotte de Mai — En Situ", "zh": "《五月洞穴》· 现场实拍"}, "desc": {"en": "Raw AR capture: stepping through the cave's purple threshold into an orange interior, where organic branch- and vein-like tendrils grow across an uneven mountain floor.", "fr": "Capture brute en RA : franchissant le seuil violet de la grotte vers un intérieur orangé, où des vrilles organiques évoquant veines et branches recouvrent un sol montagneux irrégulier.", "zh": "AR 原始录制：穿过洞穴的紫色门槛，进入橙色的内部空间，形似枝干与血管的有机卷须爬满起伏的山地地面。"}}, {"thumb": "images/ar-05-grotte-thumb.jpg", "full": "images/ar-05-grotte-full.jpg", "title": {"en": "Grotte de Mai", "fr": "Grotte de Mai", "zh": "五月洞穴"}, "desc": {"en": "The original digital asset: a domed cave rendered in sky blue, its threshold glowing magenta and cyan, with a flame-like orange form rising from the cave floor.", "fr": "L'asset numérique original : une grotte en dôme d'un bleu ciel, son seuil luisant de magenta et de cyan, avec une forme orangée en flamme s'élevant du sol de la grotte.", "zh": "原始数字素材：一座天蓝色的穹顶洞穴，洞口泛着品红与青色的光，一团火焰状的橙色形体从洞底升起。"}}, {"thumb": "images/ar-06-sketch-thumb.jpg", "full": "images/ar-06-sketch-full.jpg", "title": {"en": "Concept Sketch — \"Grotte du Mot AR\"", "fr": "Croquis Conceptuel — « Grotte du Mot AR »", "zh": "概念手稿 ——《词语的洞穴 AR》"}, "desc": {"en": "Preparatory notes for the cave installation: the dome's invisible eye, a floor that must read like a mountain rather than lie flat, and recurring motifs of tree, root, heart, cell, and DNA that would later populate both pieces.", "fr": "Notes préparatoires pour l'installation de la grotte : l'œil invisible du dôme, un sol qui doit se lire comme une montagne et non rester plat, et les motifs récurrents de l'arbre, de la racine, du cœur, de la cellule et de l'ADN qui peupleront ensuite les deux œuvres.", "zh": "洞穴装置的前期手稿：穹顶中那只“看不见的眼睛”、必须如山峦般起伏而非平坦的地面，以及树、根、心脏、细胞与 DNA 等反复出现的意象——它们后来共同构成了这两件作品。"}}], "year": 2022}, "expressionlessskin": {"title": {"en": "Expressionless Skin", "fr": "Peau Sans Expression", "zh": "无表情皮肤"}, "desc": {"en": "In this digital video work, I created a 3D virtual face floating in a blue void.\n\nIn the digital era, we continuously drape ourselves in \"new skins\" constructed from pixels, algorithms, and textual symbols. This skin is slick, detached, and devoid of genuine emotional expressions, yet it serves as armor to disguise vulnerability and guard against the external world in virtual spaces. By juxtaposing floating language with the synthetic face, the work examines the reconstruction of identity, emotional alienation, and the \"self masked by symbols\" in our contemporary digital existence.", "fr": "Dans cette œuvre vidéo numérique, j'ai façonné un visage virtuel en 3D flottant dans un vide bleu.\n\nÀ l'ère de l'écran, nous revêtons constamment une « nouvelle peau » faite de pixels, d'algorithmes et de symboles textuels. Cette enveloppe lisse, distante et dépourvue d'expressions véritables devient une armure pour dissimuler nos vulnérabilités et nous protéger du monde extérieur dans les espaces virtuels. À travers le chevauchement du texte et du visage numérique, l'œuvre interroge la refiguration de l'identité, l'aliénation émotionnelle et le « soi dissimulé derrière le langage » dans notre société contemporaine.", "zh": "在这件数字影像作品中，我创造了一个浮动在虚空中的 3D 虚拟人脸。\n\n在数字屏幕时代，我们不断为自己穿戴上由像素、算法与文字构成的“全新表皮”。这层表皮冷漠、光滑、甚至丧失了真实的表情与情绪起伏，却成为了我们在网络与虚空空间中掩饰脆弱、防御外部世界的盔甲。作品通过文字与面孔在三维空间中的重叠与隐匿，探讨了当代个体在虚拟现实中的身份重构、情绪异化以及“被语言/符号遮蔽的自我”。"}, "meta": {"en": "2022 · Digital video / new media artwork", "fr": "2022 · Vidéo numérique / art des nouveaux médias", "zh": "2022 · 数字视频 / 新媒体影像"}, "homeWallImage": "images/expressionless-cover.jpg", "works": [{"video": "images/skinhiding.mp4", "poster": "images/skin-poster-01.jpg", "posterPool": ["images/skin-poster-01.jpg", "images/skin-poster-02.jpg", "images/skin-poster-03.jpg", "images/skin-poster-04.jpg", "images/skin-poster-05.jpg", "images/skin-poster-06.jpg"]}], "year": 2022}, "siriwhatisananimal": {"title": {"en": "Search for Nature: Siri, What is an Animal?", "fr": "À la Recherche de la Nature : Siri, Qu'est-ce Qu'un Animal ?", "zh": "Siri，什么是动物？"}, "desc": {"en": "The video begins with two queries to Siri: \"What is an animal?\" and \"Where is nature?\" The AI responds with a standardized Wikipedia definition and points to a retail store named Nature & Découvertes on Google Maps.\n\nInterweaving Siri's algorithmic answers and zoo webcam livestreams with raw 8mm film footage of wild landscapes (ocean waves, soaring birds, and bare feet on pebbles), the work interrogates the \"enclosure\" and \"virtual consumption\" of nature in contemporary society. Modern technology offers us a safe, controlled digital lens through which to observe wildlife; yet authentic nature and physical bodily experience remain perpetually outside the screen, residing in the unquantifiable, untamed realm of the physical world.", "fr": "La vidéo s'ouvre sur deux questions posées à Siri : « Qu'est-ce qu'un animal ? » et « Où est la nature ? ». L'IA répond par une définition encyclopédique et géolocalise la « nature » dans une boutique commerciale (Nature & Découvertes).\n\nEn juxtaposant les requêtes vocales, les flux des webcams de zoos et des séquences filmiques en 8mm (vagues, oiseaux en vol, pieds nus sur les galets), l'œuvre interroge l'isolement et la consommation virtuelle de la nature à l'ère numérique. L'écran fonctionne comme un « enclos numérique » rassurant qui médiatise notre rapport au vivant. Pourtant, l'expérience charnelle du monde et la véritable sauvagerie échappent irréductiblement au contrôle des algorithmes.", "zh": "视频始于向 Siri 提出的两个问题：“什么是动物？”与“自然在哪里？”算法给出了维基百科式的科学定义，并在地图上将“自然”指引向一家名为 Nature & Découvertes 的商店。\n\n作品通过将 Siri 的机械问答、动物园实时监控镜头（Live Cams）以及 8mm 胶片拍摄的真实野外影像（海浪、飞鸟、踩在碎石上的脚掌）交织在一起，探讨了当代社会中人类对自然的“隔离”与“虚拟消费”。科技与屏幕为我们构建了安全、可控的“数字围笼”，使我们习惯于通过算法与摄像头去凝视野生生命；然而，真正的自然与肉身感知，却始终存在于算法无法完全丈量与驯服的荒野之中。"}, "meta": {"en": "2021 · Single-channel digital video / new media artwork", "fr": "2021 · Vidéo numérique monocanal / art des nouveaux médias", "zh": "2021 · 单频数字影像 / 新媒体艺术"}, "homeWallExclude": true, "works": [{"video": "images/siri-animal.mp4", "poster": "images/siri-poster-01.jpg", "posterPool": ["images/siri-poster-01.jpg", "images/siri-poster-02.jpg", "images/siri-poster-03.jpg", "images/siri-poster-04.jpg", "images/siri-poster-05.jpg", "images/siri-poster-06.jpg"]}], "year": 2021}};
+const SERIES_ORDER = ["belaytionship", "symbiosis", "motion", "exile", "innerspaces", "liquidfragments", "cellophane", "desrives", "shoresclimb", "sketchbook", "blackbird", "sweetdissolution", "fleshandwild", "overlappingrealities", "expressionlessskin", "siriwhatisananimal"];
+const ABOUT_TEXT = {"en": "Hello, I'm Mingyang. A multidisciplinary artist and illustrator based in Paris.\n\n• Focus: I explore the human body, the unconscious, and the boundaries of existence. Whether investigating how the body erodes within nature or how we hide behind digital screens, acute observation of perception and presence lies at the core of my practice.\n\n• Outdoors: I am an avid outdoor enthusiast. Climbing, skiing, paragliding, caving, and camping are my ways of recharging. Deep in the wilderness, on rock faces, or inside caves, the raw physical sensation of gravity, stone, wind, and darkness keeps my creative practice grounded in genuine vitality.\n\n• Illustration: Lately, I've been loving illustration as a lighthearted and intuitive medium for self-expression. It allows me to capture the subtle dynamic between climbing partners, the warmth of physical connections, and the honest, humorous, and touching moments of daily life.", "fr": "Bonjour, je suis Mingyang. Artiste pluridisciplinaire et illustratrice basée à Paris.\n\n• Démarche : Je m'intéresse au corps humain, à l'inconscient et aux frontières de l'existence. Qu'il s'agisse d'explorer l'érosion du corps au contact de la nature ou notre dissimulation derrière les écrans numériques, l'observation fine de la perception et de la présence est au cœur de mon travail.\n\n• Plein air : Je suis une passionnée d'activités en plein air. L'escalade, le ski, le parapente, la spéléologie et le camping sont mes sources d'énergie. En pleine nature, sur la roche ou au fond des grottes, la sensation physique directe de la gravité, de la pierre, du vent et de l'obscurité insuffle une réelle vitalité à ma création.\n\n• Illustration : Ces derniers temps, j'aime particulièrement m'exprimer à travers l'illustration, un médium plus léger et intuitif. Il me permet de saisir la complicité subtile entre partenaires d'escalade, la chaleur des contacts humains et ces petits instants quotidiens, à la fois vrais, drôles et touchants.", "zh": "Hello，我是陆鸣阳。一名生活在巴黎的跨媒介艺术创作者与插画师。\n\n• 关于探索：我关注人类躯体、潜意识与存在的边界。无论是探讨肉身在自然中的消融，还是现代人在数字屏障下的自我隐匿，对“感知与存在”的敏锐观察是我所有创作的起点。\n\n• 关于户外：我是个重度户外爱好者。攀岩、滑雪、滑翔伞、探洞与露营是我汲取能量的方式。在荒野、岩壁与洞穴深处，肉体对重力、岩石、风与黑暗的直接感知，让我的创作始终保持着真实的生命力。\n\n• 关于插画：最近我很喜欢用插画来表达自己。它更轻快、直观，让我能随时记录攀岩搭档间的微妙默契、人际接触的温度，以及日常里那些真实、幽默又动人的微小瞬间。"};
+
+const I18N = {
+  nav_work:      { en:"Work", fr:"Travaux", zh:"作品" },
+  nav_intro:     { en:"About", fr:"À propos", zh:"关于" },
+  back_btn:      { en:"Back to all work", fr:"Retour à tous les travaux", zh:"返回全部作品" },
+  name_tagline:  { en:"Illustrator. Click the name for the intro, hover the wall to pause.",
+                   fr:"Illustratrice. Cliquez sur le nom pour la présentation, survolez le mur pour faire une pause.",
+                   zh:"插画师。点击名字进入简介，鼠标悬停作品墙可暂停浏览。" },
+  intro_heading: { en:"Hi, I'm Lyu Mingyang", fr:"Bonjour, je suis Lyu Mingyang", zh:"你好，我是 Lyu Mingyang" },
+  piece_label:   { en:"Piece", fr:"Pièce", zh:"作品" },
+  allwork_heading: { en:"All Work", fr:"Tous les travaux", zh:"全部作品" },
+  allwork_sub:   { en:"Every series in one place. Hover a cover to preview, click to open.",
+                   fr:"Toutes les séries réunies. Survolez une couverture pour prévisualiser, cliquez pour ouvrir.",
+                   zh:"所有系列都在这里。鼠标悬停封面可预览，点击进入。" },
+  piece_count:   { en:"pieces", fr:"pièces", zh:"件作品" },
+  undated:       { en:"Undated", fr:"Non daté", zh:"年代待定" }
+};
+
+let currentLang = 'en';
+
+function seriesTitle(seriesId, lang){
+  const s = SERIES[seriesId];
+  return s.titleFixed ? s.titleFixed : s.title[lang];
+}
+
+function applyLang(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.dataset.i18n;
+    if(I18N[key]) el.textContent = I18N[key][lang];
+  });
+  document.querySelectorAll('.lang-switch button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  if(currentGalleryId){
+    renderGalleryText(currentGalleryId);
+  }
+  document.getElementById('intro-body').textContent = ABOUT_TEXT[lang];
+  renderPieceLabels();
+  if(typeof renderAllWorkText === 'function') renderAllWorkText();
+}
+
+document.querySelectorAll('.lang-switch button').forEach(btn=>{
+  btn.addEventListener('click', ()=> applyLang(btn.dataset.lang));
+});
+
+/* ---------------- uniform checkerboard grid ---------------- */
+const COLS = 6, CELL = 200, GAP = 28;
+const TOTAL_CELLS_TARGET = 26;
+const perRowFilled = Math.ceil(COLS / 2);
+const rowsUsed = Math.ceil(TOTAL_CELLS_TARGET / perRowFilled);
+
+let cellCoords = [];
+outerLoop:
+for(let r=0; r<rowsUsed; r++){
+  for(let c=0; c<COLS; c++){
+    if((r+c)%2===0){
+      cellCoords.push({gx:c, gy:r});
+      if(cellCoords.length >= TOTAL_CELLS_TARGET) break outerLoop;
+    }
+  }
+}
+
+// only show works from series created in 2019 or later on the home wall
+const HOME_WALL_MIN_YEAR = 2019;
+const homeEligibleSeries = SERIES_ORDER.filter(sid => (SERIES[sid].year || 0) >= HOME_WALL_MIN_YEAR && !SERIES[sid].homeWallExclude);
+
+// for works that provide a posterPool (e.g. a single video piece with several
+// candidate screenshots), pick a random one each time instead of always the
+// same fixed frame; falls back to thumb/poster as before otherwise.
+function pickThumbForWork(work){
+  if(work.posterPool && work.posterPool.length){
+    return work.posterPool[Math.floor(Math.random() * work.posterPool.length)];
+  }
+  return work.thumb || work.poster;
+}
+
+// for series that should always show one fixed image on the home wall
+// (rather than a random/rotating work), set series.homeWallImage.
+function getHomeThumb(sid, wi){
+  const s = SERIES[sid];
+  if(s.homeWallImage) return s.homeWallImage;
+  return pickThumbForWork(s.works[wi]);
+}
+
+// pick a work for each cell: choose a series uniformly at random first,
+// then a random unused work within it, so every series has equal odds regardless of size
+const usedWorkKeys = new Set();
+function pickWorkEqualSeriesOdds(){
+  for(let attempt = 0; attempt < 40; attempt++){
+    const sid = homeEligibleSeries[Math.floor(Math.random() * homeEligibleSeries.length)];
+    const works = SERIES[sid].works;
+    const wi = Math.floor(Math.random() * works.length);
+    const key = sid + ':' + wi;
+    if(usedWorkKeys.has(key)) continue;
+    usedWorkKeys.add(key);
+    return { seriesId: sid, workIndex: wi, thumb: getHomeThumb(sid, wi), key };
+  }
+  // fallback: scan for any unused work if random attempts kept colliding
+  for(const sid of homeEligibleSeries){
+    const works = SERIES[sid].works;
+    for(let wi=0; wi<works.length; wi++){
+      const key = sid + ':' + wi;
+      if(!usedWorkKeys.has(key)){
+        usedWorkKeys.add(key);
+        return { seriesId: sid, workIndex: wi, thumb: getHomeThumb(sid, wi), key };
+      }
+    }
+  }
+  return null; // pool exhausted (shouldn't happen with current catalog size)
+}
+
+// every cell gets a distinct work — no repeats anywhere on the wall
+let items = cellCoords.map(cell=>{
+  const picked = pickWorkEqualSeriesOdds();
+  return picked ? { gx: cell.gx, gy: cell.gy, work: picked } : null;
+}).filter(Boolean);
+
+items.forEach(item=>{
+  item.x = item.gx * (CELL + GAP);
+  item.y = item.gy * (CELL + GAP);
+  item.w = CELL;
+  item.h = CELL;
+});
+
+const TILE_W = COLS * CELL + (COLS - 1) * GAP;
+const TILE_H = rowsUsed * CELL + (rowsUsed - 1) * GAP;
+const OFF_X = TILE_W + GAP;
+const OFF_Y = TILE_H + GAP;
+
+const track = document.getElementById('track');
+const offsets = [[0,0],[OFF_X,0],[0,OFF_Y],[OFF_X,OFF_Y]];
+let allThumbs = [];
+
+offsets.forEach(([ox,oy])=>{
+  const tile = document.createElement('div');
+  tile.className = 'tile';
+  tile.style.transform = `translate3d(${ox}px, ${oy}px, 0)`;
+  items.forEach(item=>{
+    const el = document.createElement('div');
+    el.className = 'thumb';
+    el.dataset.series = item.work.seriesId;
+    el.style.left = item.x + 'px';
+    el.style.top = item.y + 'px';
+    el.style.width = item.w + 'px';
+    el.style.height = item.h + 'px';
+    const img = document.createElement('img');
+    img.src = item.work.thumb;
+    img.alt = seriesTitle(item.work.seriesId, 'en');
+    if(SERIES[item.work.seriesId].squareFit){ el.classList.add('square-fit'); }
+    const cap = document.createElement('div');
+    cap.className = 'cap piece-cap';
+    cap.dataset.series = item.work.seriesId;
+    cap.dataset.idx = item.work.workIndex;
+    el.appendChild(img);
+    el.appendChild(cap);
+    tile.appendChild(el);
+    allThumbs.push(el);
+  });
+  track.appendChild(tile);
+});
+track.style.width = (OFF_X*2) + 'px';
+track.style.height = (OFF_Y*2) + 'px';
+
+function pieceLabel(seriesId, idx, lang){
+  const s = SERIES[seriesId];
+  const w = s.works[idx];
+  if(w.title){ return w.title[lang]; }
+  return seriesTitle(seriesId, lang) + ' — ' + I18N.piece_label[lang] + ' ' + String(idx+1).padStart(2,'0');
+}
+
+function renderPieceLabels(){
+  document.querySelectorAll('.piece-cap').forEach(el=>{
+    el.textContent = pieceLabel(el.dataset.series, parseInt(el.dataset.idx,10), currentLang);
+  });
+}
+
+requestAnimationFrame(()=>{
+  allThumbs.forEach((el,i)=>{
+    const delay = (i % items.length) * 40;
+    setTimeout(()=> el.classList.add('in-view'), 300 + delay);
+  });
+});
+
+const stage = document.getElementById('stage');
+let posX = 0, posY = 0;
+let paused = false;
+const SPEED = 16;
+let lastT = null;
+
+function tick(t){
+  if(lastT === null) lastT = t;
+  const dt = (t - lastT) / 1000;
+  lastT = t;
+  if(!paused){
+    posX -= SPEED * dt;
+    posY -= SPEED * dt;
+    if(posX <= -OFF_X) posX += OFF_X;
+    if(posY <= -OFF_Y) posY += OFF_Y;
+    track.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+stage.addEventListener('mouseenter', ()=> paused = true);
+stage.addEventListener('mouseleave', ()=> paused = false);
+
+/* ---------------- navigation ---------------- */
+const viewHome = document.getElementById('view-home');
+const viewAllwork = document.getElementById('view-allwork');
+const viewGallery = document.getElementById('view-gallery');
+const viewIntro = document.getElementById('view-intro');
+const masonry = document.getElementById('masonry');
+const contactSheet = document.getElementById('contact-sheet');
+const allworkTimeline = document.getElementById('allwork-timeline');
+let currentGalleryId = null;
+let lastMainView = 'home'; // 'home' or 'allwork' — where the back button should return to
+
+function hideAllViews(){
+  viewHome.style.display = 'none';
+  viewAllwork.classList.remove('active');
+  viewGallery.classList.remove('active');
+  viewIntro.classList.remove('active');
+}
+
+function showHome(){
+  hideAllViews();
+  viewHome.style.display = '';
+  lastMainView = 'home';
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function showAllWork(){
+  hideAllViews();
+  viewAllwork.classList.add('active');
+  lastMainView = 'allwork';
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function showLastMain(){
+  if(lastMainView === 'allwork') showAllWork();
+  else showHome();
+}
+
+function showIntro(){
+  document.getElementById('intro-photo').innerHTML = `<img src="images/about-photo.jpg" alt="">`;
+  hideAllViews();
+  viewIntro.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+/* ---------------- all-work overview cards ---------------- */
+let allworkCardState = []; // {seriesId, timer, index}
+
+function buildAllWorkGrid(){
+  allworkTimeline.innerHTML = '';
+  allworkCardState = [];
+
+  // group series by year (descending), undated series go in a trailing group
+  const years = [];
+  SERIES_ORDER.forEach(sid=>{
+    const y = SERIES[sid].year || null;
+    if(!years.includes(y)) years.push(y);
+  });
+  years.sort((a,b)=>{
+    if(a === null) return 1;
+    if(b === null) return -1;
+    return b - a;
+  });
+
+  years.forEach(year=>{
+    const block = document.createElement('div');
+    block.className = 'timeline-year-block';
+
+    const label = document.createElement('div');
+    label.className = 'timeline-year-label';
+    label.textContent = year ? year : I18N.undated[currentLang];
+    block.appendChild(label);
+
+    const cardsRow = document.createElement('div');
+    cardsRow.className = 'timeline-cards';
+    block.appendChild(cardsRow);
+
+    SERIES_ORDER.filter(sid => (SERIES[sid].year || null) === year).forEach(sid=>{
+      const s = SERIES[sid];
+      const card = document.createElement('div');
+      card.className = 'allwork-card';
+      card.dataset.series = sid;
+
+      const cover = document.createElement('div');
+      cover.className = 'cover';
+      const imgA = document.createElement('img');
+      const imgB = document.createElement('img');
+      imgA.src = pickThumbForWork(s.works[0]);
+      imgA.alt = seriesTitle(sid, 'en');
+      imgB.alt = seriesTitle(sid, 'en');
+      imgA.classList.add('layer-active');
+      cover.appendChild(imgA);
+      cover.appendChild(imgB);
+
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = seriesTitle(sid, currentLang);
+
+      const count = document.createElement('div');
+      count.className = 'card-count';
+      count.textContent = s.works.length + ' ' + I18N.piece_count[currentLang];
+
+      card.appendChild(cover);
+      card.appendChild(title);
+      card.appendChild(count);
+      cardsRow.appendChild(card);
+
+      const state = { seriesId: sid, index: 0, timer: null, layers: [imgA, imgB], activeLayer: 0, title, count };
+      allworkCardState.push(state);
+
+      card.addEventListener('mouseenter', ()=>{
+        if(s.works.length < 2) return;
+        state.timer = setInterval(()=>{
+          state.index = (state.index + 1) % s.works.length;
+          const w = s.works[state.index];
+          const nextLayer = state.layers[1 - state.activeLayer];
+          const curLayer = state.layers[state.activeLayer];
+          nextLayer.src = pickThumbForWork(w);
+          nextLayer.classList.add('layer-active');
+          curLayer.classList.remove('layer-active');
+          state.activeLayer = 1 - state.activeLayer;
+        }, 1200);
+      });
+      card.addEventListener('mouseleave', ()=>{
+        if(state.timer){ clearInterval(state.timer); state.timer = null; }
+        state.index = 0;
+        const first = pickThumbForWork(s.works[0]);
+        const curLayer = state.layers[state.activeLayer];
+        const otherLayer = state.layers[1 - state.activeLayer];
+        curLayer.src = first;
+        curLayer.classList.add('layer-active');
+        otherLayer.classList.remove('layer-active');
+      });
+      card.addEventListener('click', ()=> openGallery(sid));
+    });
+
+    allworkTimeline.appendChild(block);
+  });
+}
+
+function renderAllWorkText(){
+  allworkCardState.forEach(state=>{
+    const s = SERIES[state.seriesId];
+    state.title.textContent = seriesTitle(state.seriesId, currentLang);
+    state.count.textContent = s.works.length + ' ' + I18N.piece_count[currentLang];
+  });
+}
+
+function renderGalleryText(seriesId){
+  const s = SERIES[seriesId];
+  document.getElementById('series-title').textContent = seriesTitle(seriesId, currentLang);
+  document.getElementById('series-meta').textContent = s.meta ? s.meta[currentLang] : '';
+  document.getElementById('series-desc').textContent = s.desc ? s.desc[currentLang] : '';
+  renderPieceLabels();
+  renderPieceDescs();
+}
+
+function renderPieceDescs(){
+  document.querySelectorAll('.piece').forEach(piece=>{
+    const sid = piece.dataset.series;
+    const idx = parseInt(piece.dataset.idx, 10);
+    if(sid === undefined || isNaN(idx)) return;
+    const w = SERIES[sid].works[idx];
+    const meta = piece.querySelector('.meta');
+    if(!meta) return;
+    meta.innerHTML = '';
+    if(w.desc){
+      const t = document.createElement('div');
+      t.className = 'meta-title';
+      t.textContent = w.title ? w.title[currentLang] : pieceLabel(sid, idx, currentLang);
+      const d = document.createElement('div');
+      d.className = 'meta-desc';
+      d.textContent = w.desc[currentLang];
+      meta.appendChild(t);
+      meta.appendChild(d);
+    } else {
+      meta.textContent = pieceLabel(sid, idx, currentLang);
+    }
+  });
+}
+
+function openGallery(seriesId){
+  currentGalleryId = seriesId;
+  const s = SERIES[seriesId];
+  masonry.innerHTML = '';
+  contactSheet.innerHTML = '';
+
+  if(s.displayMode === 'contactsheet'){
+    masonry.style.display = 'none';
+    contactSheet.style.display = 'flex';
+    const tiles = [];
+    s.works.forEach((w, i)=>{
+      const tile = document.createElement('div');
+      tile.className = 'contact-tile';
+      const img = document.createElement('img');
+      img.src = w.thumb;
+      img.alt = seriesTitle(seriesId, 'en') + ' ' + (i+1);
+      tile.appendChild(img);
+      tile.addEventListener('click', ()=> openLightbox(seriesId, i));
+      contactSheet.appendChild(tile);
+      tiles.push(tile);
+    });
+    renderGalleryText(seriesId);
+    hideAllViews();
+    viewGallery.classList.add('active');
+    window.scrollTo({top:0,behavior:'instant'});
+    const io3 = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('in-view'); io3.unobserve(e.target); }
+      });
+    },{threshold:0.1});
+    tiles.forEach((t,i)=>{
+      t.style.transitionDelay = (Math.min(i,20)*20)+'ms';
+      io3.observe(t);
+    });
+    return;
+  }
+
+  masonry.style.display = 'grid';
+  contactSheet.style.display = 'none';
+  const pieces = [];
+  s.works.forEach((w, i)=>{
+    const piece = document.createElement('div');
+    piece.className = 'piece';
+    piece.dataset.series = seriesId;
+    piece.dataset.idx = i;
+    let media;
+    if(w.video){
+      media = document.createElement('video');
+      media.src = w.video;
+      media.poster = w.poster;
+      media.autoplay = true;
+      media.muted = true;
+      media.loop = true;
+      media.playsInline = true;
+      media.controls = true;
+    } else {
+      media = document.createElement('img');
+      media.src = w.full;
+      media.alt = seriesTitle(seriesId, 'en');
+    }
+    const frame = document.createElement('div');
+    frame.className = 'piece-frame';
+    if(s.squareFit){ frame.classList.add('square-fit'); }
+    frame.appendChild(media);
+    if(w.video){
+      const expandBtn = document.createElement('button');
+      expandBtn.className = 'expand-btn';
+      expandBtn.setAttribute('aria-label', 'Expand video');
+      expandBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+      expandBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        openLightbox(seriesId, i);
+      });
+      frame.appendChild(expandBtn);
+    }
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    piece.appendChild(frame);
+    piece.appendChild(meta);
+    masonry.appendChild(piece);
+    pieces.push(piece);
+  });
+  renderGalleryText(seriesId);
+  hideAllViews();
+  viewGallery.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+
+  const io2 = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in-view'); io2.unobserve(e.target); }
+    });
+  },{threshold:0.1});
+  pieces.forEach((p,i)=>{
+    p.style.transitionDelay = (Math.min(i,8)*60)+'ms';
+    io2.observe(p);
+  });
+}
+
+/* ---------------- lightbox ---------------- */
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lb-img');
+const lbVideo = document.getElementById('lb-video');
+const lbCount = document.getElementById('lb-count');
+let lbSeriesId = null, lbIndex = 0;
+
+function openLightbox(seriesId, idx){
+  lbSeriesId = seriesId;
+  lbIndex = idx;
+  renderLightbox();
+  lightbox.classList.add('active');
+}
+function renderLightbox(){
+  const works = SERIES[lbSeriesId].works;
+  const w = works[lbIndex];
+  if(w.video){
+    lbImg.style.display = 'none';
+    lbImg.removeAttribute('src');
+    lbVideo.style.display = 'block';
+    lbVideo.src = w.video;
+    if(w.poster) lbVideo.poster = w.poster;
+    lbVideo.currentTime = 0;
+    lbVideo.play().catch(()=>{});
+  } else {
+    lbVideo.pause();
+    lbVideo.style.display = 'none';
+    lbVideo.removeAttribute('src');
+    lbImg.style.display = 'block';
+    lbImg.src = w.full;
+    lbImg.alt = seriesTitle(lbSeriesId, 'en') + ' ' + (lbIndex+1);
+  }
+  lbCount.textContent = (lbIndex+1) + ' / ' + works.length;
+}
+function closeLightbox(){
+  lightbox.classList.remove('active');
+  lbVideo.pause();
+}
+function lbStep(delta){
+  const works = SERIES[lbSeriesId].works;
+  lbIndex = (lbIndex + delta + works.length) % works.length;
+  renderLightbox();
+}
+document.getElementById('lb-close').addEventListener('click', closeLightbox);
+document.getElementById('lb-prev').addEventListener('click', ()=> lbStep(-1));
+document.getElementById('lb-next').addEventListener('click', ()=> lbStep(1));
+lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', (e)=>{
+  if(!lightbox.classList.contains('active')) return;
+  if(e.key === 'Escape') closeLightbox();
+  if(e.key === 'ArrowLeft') lbStep(-1);
+  if(e.key === 'ArrowRight') lbStep(1);
+});
+
+track.addEventListener('click',(e)=>{
+  const thumb = e.target.closest('.thumb');
+  if(!thumb) return;
+  openGallery(thumb.dataset.series);
+});
+
+buildAllWorkGrid();
+
+document.getElementById('name-overlay').addEventListener('click', showIntro);
+document.getElementById('nav-intro').addEventListener('click', (e)=>{ e.preventDefault(); showIntro(); });
+document.getElementById('back-btn').addEventListener('click', showLastMain);
+document.getElementById('back-btn-intro').addEventListener('click', showLastMain);
+document.getElementById('logo-home').addEventListener('click', (e)=>{ e.preventDefault(); showHome(); });
+document.getElementById('nav-work').addEventListener('click', (e)=>{ e.preventDefault(); showAllWork(); });
+
+applyLang('en');
+</script>
+</body>
+</html>
