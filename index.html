@@ -293,34 +293,58 @@
 
   #lightbox{
     position:fixed; inset:0; z-index:200;
-    background:rgba(255,255,255,0.97);
+    background:rgba(18,18,18,0.86);
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
     display:none;
-    align-items:center; justify-content:center;
   }
   #lightbox.active{ display:flex; }
-  #lightbox img{
-    max-width:86vw; max-height:80vh;
-    object-fit:contain;
-    display:block;
+  #lightbox .lb-stage{
+    position:relative; flex:1 1 auto; min-width:0;
+    display:flex; align-items:center; justify-content:center;
+    padding:56px 64px;
   }
+  #lightbox .lb-stage img{
+    max-width:100%; max-height:100%;
+    object-fit:contain; display:block;
+    box-shadow:0 12px 50px rgba(0,0,0,.35);
+  }
+  #lightbox .lb-panel{
+    position:relative; flex:0 0 360px; width:360px;
+    background:rgba(255,255,255,0.82);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    color:#111; overflow-y:auto;
+    padding:72px 36px 48px;
+  }
+  #lightbox .lb-series{ font-size:12px; letter-spacing:.6px; text-transform:uppercase; color:#555; margin:0 0 10px; }
+  #lightbox .lb-title{ font-size:22px; line-height:1.3; font-weight:600; margin:0 0 18px; color:#111; }
+  #lightbox .lb-text{ font-size:13.5px; line-height:1.8; color:#111; white-space:pre-line; margin:0; }
   #lightbox .lb-close{
-    position:absolute; top:24px; right:32px;
+    position:absolute; top:24px; right:28px; z-index:3;
     font-size:15px; letter-spacing:0.3px;
     background:none; border:none; cursor:pointer;
-    color:var(--ink-soft); font-family:'Space Grotesk', sans-serif;
+    color:#333; font-family:'Space Grotesk', sans-serif;
   }
-  #lightbox .lb-close:hover{ color:var(--ink); }
+  #lightbox .lb-close:hover{ color:#000; }
   #lightbox .lb-nav{
     position:absolute; top:50%; transform:translateY(-50%);
     background:none; border:none; cursor:pointer;
-    color:var(--ink-soft); padding:14px;
+    color:rgba(255,255,255,.7); padding:14px;
   }
-  #lightbox .lb-nav:hover{ color:var(--ink); }
+  #lightbox .lb-nav:hover{ color:#fff; }
   #lightbox .lb-nav svg{ width:22px; height:22px; }
   .lb-prev{ left:8px; } .lb-next{ right:8px; }
   #lightbox .lb-count{
-    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
-    font-size:12px; color:var(--ink-soft);
+    position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+    font-size:12px; color:rgba(255,255,255,.7);
+  }
+  @media (max-width:760px){
+    #lightbox.active{ flex-direction:column; }
+    #lightbox .lb-stage{ padding:48px 40px 16px; flex:1 1 0; min-height:0; }
+    #lightbox .lb-panel{ flex:0 0 auto; width:auto; max-height:38vh; padding:20px 22px 28px; }
+    #lightbox .lb-title{ font-size:18px; margin-bottom:10px; }
+    #lightbox .lb-close{ top:14px; right:18px; color:#333; }
+    #lightbox .lb-nav{ padding:10px 6px; }
+    #lightbox .lb-count{ bottom:6px; }
   }
   .piece .meta-title{ font-size:13px; color:var(--ink); font-weight:600; margin-bottom:6px; }
   .piece .meta-desc{ font-size:12.5px; color:var(--ink-soft); line-height:1.7; }
@@ -455,15 +479,22 @@
 </section>
 
 <div id="lightbox">
-  <button class="lb-close" id="lb-close">CLOSE</button>
-  <button class="lb-nav lb-prev" id="lb-prev">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-  </button>
-  <img id="lb-img" src="" alt="">
-  <button class="lb-nav lb-next" id="lb-next">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </button>
-  <div class="lb-count" id="lb-count"></div>
+  <div class="lb-stage" id="lb-stage">
+    <button class="lb-nav lb-prev" id="lb-prev">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <img id="lb-img" src="" alt="">
+    <button class="lb-nav lb-next" id="lb-next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <div class="lb-count" id="lb-count"></div>
+  </div>
+  <aside class="lb-panel" id="lb-panel">
+    <button class="lb-close" id="lb-close">CLOSE</button>
+    <p class="lb-series" id="lb-series"></p>
+    <h3 class="lb-title" id="lb-title"></h3>
+    <p class="lb-text" id="lb-text"></p>
+  </aside>
 </div>
 
 <section id="view-intro">
@@ -547,13 +578,15 @@ const SHOP_ITEMS = [
     image: "images/symb-02-full.jpg",
     title: { en: "Wild Roar in the Waves", fr: "Hennissement dans les Vagues", zh: "嘶鸣与沉浮" },
     meta:  { en: "2023 · Digital print, 30 × 30 cm", fr: "2023 · Tirage numérique, 30 × 30 cm", zh: "2023 · 数码版画，30 × 30 厘米" },
-    price: 65
+    price: 65,
+    stripe: "https://buy.stripe.com/dRm9AT6fsgLNcQw1iEdMI0h"
   },
   {
     image: "images/symb-03-full.jpg",
     title: { en: "In Bloom, In Decay", fr: "L'Étreinte et la Floraison", zh: "花海与终局" },
     meta:  { en: "2023 · Digital print, 30 × 30 cm", fr: "2023 · Tirage numérique, 30 × 30 cm", zh: "2023 · 数码版画，30 × 30 厘米" },
-    price: 65
+    price: 65,
+    stripe: "https://buy.stripe.com/dRm28r6fsdzBbMse5qdMI0i"
   },
   {
     image: "images/shores-01-full.jpg",
@@ -619,6 +652,69 @@ const SHOP_ITEMS = [
     stripe: "https://buy.stripe.com/8x200j5bofHJ03KaTedMI09"
   },
   {
+    image: "images/shores-10-full.jpg",
+    title: { en: "Body of the Mountain", fr: "Le Corps Montagne", zh: "山之身" },
+    meta:  DESRIVES_META,
+    price: 90,
+    stripe: "https://buy.stripe.com/bJe6oHdHU3Z14k0e5qdMI0b"
+  },
+  {
+    image: "images/shores-12-full.jpg",
+    title: { en: "The Serpent's Hold", fr: "La Prise du Serpent", zh: "蛇缠" },
+    meta:  DESRIVES_META,
+    price: 90,
+    stripe: "https://buy.stripe.com/cNibJ16fs3Z1dUA0eAdMI0c"
+  },
+  {
+    image: "images/shores-13-full.jpg",
+    title: { en: "Disturbed Moss in the Forest", fr: "La Mousse Dérangée de la Forêt", zh: "森林里被打扰的苔藓" },
+    meta:  DESRIVES_META,
+    price: 90,
+    stripe: "https://buy.stripe.com/cNi5kD6fs3Z1aIo0eAdMI0d"
+  },
+  {
+    image: "images/shores-15-full.jpg",
+    title: { en: "Grip", fr: "Prise", zh: "抓握" },
+    meta:  DESRIVES_META,
+    price: 90,
+    stripe: "https://buy.stripe.com/7sY8wP7jwbrtcQw0eAdMI0e"
+  },
+  {
+    image: "images/shores-16-full.jpg",
+    title: { en: "Chalked Hands", fr: "Mains de Magnésie", zh: "镁粉之手" },
+    meta:  DESRIVES_META,
+    price: 90,
+    stripe: "https://buy.stripe.com/fZu8wPcDQ0MP5o47H2dMI0f"
+  },
+  {
+    image: "images/shores-14-full.jpg",
+    title: { en: "Medusa", fr: "Méduse", zh: "水母" },
+    meta:  DESRIVES_META,
+    price: 90,
+    stripe: "https://buy.stripe.com/bJedR9fQ2anp6s8e5qdMI0g"
+  },
+  {
+    image: "images/rives-01-full.jpg",
+    title: { en: "Sunlight and Leisure", fr: "Paresse au Soleil", zh: "阳光与闲暇" },
+    meta:  DESRIVES_META,
+    price: 80,
+    stripe: "https://buy.stripe.com/9B65kD6fs2UXaIof9udMI0j"
+  },
+  {
+    image: "images/rives-02-full.jpg",
+    title: { en: "Riverbank", fr: "au Bord de l'Eau", zh: "河畔" },
+    meta:  DESRIVES_META,
+    price: 80,
+    stripe: "https://buy.stripe.com/aFacN5fQ23Z1cQw3qMdMI0k"
+  },
+  {
+    image: "images/rives-03-full.jpg",
+    title: { en: "The Observer", fr: "L'Observateur", zh: "观者" },
+    meta:  DESRIVES_META,
+    price: 80,
+    stripe: "https://buy.stripe.com/28EfZh8nAeDF7wcaTedMI0l"
+  },
+  {
     image: "images/stickers-acro-full.jpg",
     title: { en: "Acro du Bloc — Sticker Set", fr: "Acro du Bloc — Set de stickers", zh: "Acro du Bloc 贴纸套装" },
     meta:  { en: "Set of 3 sticker sheets · Climbing illustrations", fr: "Set de 3 planches de stickers · Illustrations d'escalade", zh: "一套 3 张贴纸 · 攀岩插画" },
@@ -651,6 +747,7 @@ function applyLang(lang){
   renderPieceLabels();
   if(typeof renderAllWorkText === 'function') renderAllWorkText();
   if(typeof renderShop === 'function') renderShop();
+  if(typeof lightbox !== 'undefined' && lightbox.classList.contains('active')) renderLightbox();
 }
 
 document.querySelectorAll('.lang-switch button').forEach(btn=>{
@@ -1143,10 +1240,20 @@ function openLightbox(seriesId, idx){
   lightbox.classList.add('active');
 }
 function renderLightbox(){
-  const works = SERIES[lbSeriesId].works;
-  lbImg.src = works[lbIndex].full;
+  const ser = SERIES[lbSeriesId];
+  const works = ser.works;
+  const w = works[lbIndex];
+  lbImg.src = w.full;
   lbImg.alt = seriesTitle(lbSeriesId, 'en') + ' ' + (lbIndex+1);
   lbCount.textContent = (lbIndex+1) + ' / ' + works.length;
+  const sTitle = seriesTitle(lbSeriesId, currentLang);
+  const hasTitle = !!w.title;
+  document.getElementById('lb-series').textContent = hasTitle ? sTitle : '';
+  document.getElementById('lb-title').textContent = hasTitle ? w.title[currentLang] : sTitle + ' · ' + String(lbIndex+1).padStart(2,'0');
+  let text = '';
+  if(w.desc){ text = w.desc[currentLang]; }
+  else if(ser.meta){ text = ser.meta[currentLang]; }
+  document.getElementById('lb-text').textContent = text || '';
 }
 function closeLightbox(){ lightbox.classList.remove('active'); }
 function lbStep(delta){
